@@ -29,12 +29,27 @@
             padding: 25px;
             border-radius: 16px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         .balance-card h1 { margin: 10px 0; font-size: 42px; color: #e0aaff; }
+        .balance-card .usdt-value { font-size: 18px; color: #53f2c3; font-weight: bold; margin-bottom: 5px;}
         .balance-card p { margin: 0; color: #a19bb5; font-size: 14px; letter-spacing: 1px; }
+        
+        .withdraw-btn {
+            background: #26a17b;
+            color: white;
+            width: 100%;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(38, 161, 123, 0.3);
+        }
         
         .task-container { display: flex; flex-direction: column; gap: 15px; }
         
@@ -61,12 +76,10 @@
             transition: 0.3s;
             box-shadow: 0 0 10px rgba(123, 44, 191, 0.4);
         }
-        .watch-btn:active { transform: scale(0.95); }
         .watch-btn:disabled {
             background: #2a2245;
             color: #635787;
             box-shadow: none;
-            cursor: not-allowed;
         }
         h3.section-title { margin-bottom: 15px; color: #c4b5fd; font-size: 18px; text-transform: uppercase; letter-spacing: 1px;}
     </style>
@@ -77,60 +90,88 @@
 
     <div class="balance-card">
         <p>TOTAL BALANCE</p>
-        <h1 id="balance">0</h1>
+        <h1 id="balance">500</h1>
+        <div class="usdt-value" id="usdt-balance">≈ $0.05 USDT</div>
         <p>💫 GALAXY</p>
     </div>
 
+    <button class="withdraw-btn" onclick="requestWithdraw()">💸 Withdraw (BSC BEP-20)</button>
+
     <h3 class="section-title">📺 Watch Ads & Earn</h3>
     
-    <div class="task-container">
-        <!-- Task 1 -->
-        <div class="task-card">
-            <div class="task-info">
-                <h3>Watch Video #1</h3>
-                <p>+ 100 GALAXY</p>
-            </div>
-            <button class="watch-btn" id="btn1" onclick="startTask(1, 'https://youtube.com', 100)">WATCH</button>
-        </div>
-
-        <!-- Task 2 -->
-        <div class="task-card">
-            <div class="task-info">
-                <h3>Watch Video #2</h3>
-                <p>+ 100 GALAXY</p>
-            </div>
-            <button class="watch-btn" id="btn2" onclick="startTask(2, 'https://youtube.com', 100)">WATCH</button>
-        </div>
-
-        <!-- Task 3 -->
-        <div class="task-card">
-            <div class="task-info">
-                <h3>Watch Video #3</h3>
-                <p>+ 100 GALAXY</p>
-            </div>
-            <button class="watch-btn" id="btn3" onclick="startTask(3, 'https://youtube.com', 100)">WATCH</button>
-        </div>
-    </div>
+    <!-- Tasks container -->
+    <div class="task-container" id="task-container"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
-        let currentBalance = 0;
+        let galaxyBalance = 500; 
+        const usdtRate = 0.0001; 
+
+        // Aapke 6 YouTube links
+        const videoPool = [
+            { id: 1, title: "Watch Video #1", url: "https://youtu.be/_hzf9W746hk?si=7EkyntxrRJyMRNUA" },
+            { id: 2, title: "Watch Video #2", url: "https://youtu.be/p3AlcT7qGGM?si=ehkyBtHuyYblyS9s" },
+            { id: 3, title: "Watch Video #3", url: "https://youtu.be/CCDFnBjzbPM?si=SQP9MS-MCs7aofVG" },
+            { id: 4, title: "Watch Video #4", url: "https://youtu.be/unTAEBvggus?si=7vD8UkvwIdN7VO03" },
+            { id: 5, title: "Watch Video #5", url: "https://youtu.be/Hja_iwEkfmI?si=ZXUMVXyM17bBxfYU" },
+            { id: 6, title: "Watch Video #6", url: "https://youtu.be/I5mLBbsuAdA?si=VH2iyck33TTyj7I_" }
+        ];
+
+        // Shuffle function
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Shuffle karke shuru ke 3 links nikalna
+        shuffleArray(videoPool);
+        const selectedVideos = videoPool.slice(0, 3);
+
+        // HTML me 3 tasks dikhana
+        const taskContainer = document.getElementById('task-container');
+        selectedVideos.forEach((video) => {
+            const taskHTML = `
+                <div class="task-card">
+                    <div class="task-info">
+                        <h3>${video.title}</h3>
+                        <p>+ 100 GALAXY ($0.01)</p>
+                    </div>
+                    <button class="watch-btn" id="btn${video.id}" onclick="startTask(${video.id}, '${video.url}', 100)">WATCH</button>
+                </div>
+            `;
+            taskContainer.innerHTML += taskHTML;
+        });
+
+        function updateDisplay() {
+            document.getElementById('balance').innerText = galaxyBalance;
+            let usdtValue = (galaxyBalance * usdtRate).toFixed(2);
+            document.getElementById('usdt-balance').innerText = `≈ $${usdtValue} USDT`;
+        }
 
         function startTask(taskId, videoUrl, reward) {
             tg.openLink(videoUrl);
-            
             let btn = document.getElementById('btn' + taskId);
             btn.innerText = 'PLAYING...';
             btn.disabled = true;
 
             setTimeout(() => {
-                currentBalance += reward;
-                document.getElementById('balance').innerText = currentBalance;
+                galaxyBalance += reward;
+                updateDisplay();
                 btn.innerText = 'DONE';
                 tg.HapticFeedback.notificationOccurred('success');
             }, 15000); 
+        }
+
+        function requestWithdraw() {
+            if(galaxyBalance < 700) {
+                tg.showAlert('❌ Minimum withdrawal is 700 GALAXY ($0.07 USDT). Earn more to withdraw!');
+            } else {
+                tg.showAlert('✅ Balance is sufficient. Setup your BSC BEP-20 address in the Bot to receive Auto-Pay!');
+            }
         }
     </script>
 </body>
