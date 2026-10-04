@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galaxy Earn Bot</title>
-    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -15,31 +14,20 @@
             padding: 20px;
             min-height: 100vh;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #9d4edd; 
-            text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
-        }
+        .header { text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold; color: #9d4edd; }
         .balance-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
             padding: 25px;
             border-radius: 16px;
             text-align: center;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         .balance-card h1 { margin: 10px 0; font-size: 42px; color: #e0aaff; }
-        .balance-card .usdt-value { font-size: 18px; color: #53f2c3; font-weight: bold; margin-bottom: 5px;}
-        .balance-card p { margin: 0; color: #a19bb5; font-size: 14px; letter-spacing: 1px; }
-        
-        .withdraw-btn {
-            background: #26a17b;
-            color: white;
+        .usdt-value { font-size: 18px; color: #53f2c3; font-weight: bold; margin-bottom: 5px;}
+        .sync-btn {
+            background: #ffb703;
+            color: #000;
             width: 100%;
             border: none;
             padding: 12px;
@@ -47,14 +35,12 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(38, 161, 123, 0.3);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(255, 183, 3, 0.3);
         }
-        
         .task-container { display: flex; flex-direction: column; gap: 15px; }
-        
         .task-card {
-            background: linear-gradient(145deg, #16102b, #1f163b);
+            background: #16102b;
             padding: 15px 20px;
             border-radius: 12px;
             display: flex;
@@ -62,9 +48,8 @@
             align-items: center;
             border: 1px solid #2d2154;
         }
-        .task-info h3 { margin: 0 0 6px 0; font-size: 16px; font-weight: 600; }
+        .task-info h3 { margin: 0 0 5px 0; font-size: 16px; }
         .task-info p { margin: 0; color: #e0aaff; font-size: 14px; font-weight: bold; }
-        
         .watch-btn {
             background: #7b2cbf;
             color: white;
@@ -74,19 +59,16 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 0 10px rgba(123, 44, 191, 0.4);
         }
         .watch-btn:disabled {
             background: #2a2245;
             color: #635787;
-            box-shadow: none;
         }
-        h3.section-title { margin-bottom: 15px; color: #c4b5fd; font-size: 18px; text-transform: uppercase; letter-spacing: 1px;}
     </style>
 </head>
 <body>
 
-    <div class="header">🌌 GALAXY EARN BOT</div>
+    <div class="header">🌌 GALAXY EARN STUDIO</div>
 
     <div class="balance-card">
         <p>TOTAL BALANCE</p>
@@ -95,31 +77,28 @@
         <p>💫 GALAXY</p>
     </div>
 
-    <button class="withdraw-btn" onclick="requestWithdraw()">💸 Withdraw (BSC BEP-20)</button>
+    <button class="sync-btn" onclick="syncBalanceToBot()">🔄 Save & Sync to Bot</button>
 
-    <h3 class="section-title">📺 Watch Ads & Earn</h3>
-    
-    <!-- Tasks container -->
+    <h3 style="color: #c4b5fd; font-size: 16px; text-transform: uppercase;">📺 Daily Tasks (Refreshes in 24h)</h3>
     <div class="task-container" id="task-container"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
-        let galaxyBalance = 500; 
+        let galaxyBalance = parseInt(localStorage.getItem('galaxy_balance')) || 500; 
         const usdtRate = 0.0001; 
 
-        // Aapke 6 YouTube links
+        // 6 YouTube links pool
         const videoPool = [
-            { id: 1, title: "Watch Video #1", url: "https://youtu.be/_hzf9W746hk?si=7EkyntxrRJyMRNUA" },
-            { id: 2, title: "Watch Video #2", url: "https://youtu.be/p3AlcT7qGGM?si=ehkyBtHuyYblyS9s" },
-            { id: 3, title: "Watch Video #3", url: "https://youtu.be/CCDFnBjzbPM?si=SQP9MS-MCs7aofVG" },
-            { id: 4, title: "Watch Video #4", url: "https://youtu.be/unTAEBvggus?si=7vD8UkvwIdN7VO03" },
-            { id: 5, title: "Watch Video #5", url: "https://youtu.be/Hja_iwEkfmI?si=ZXUMVXyM17bBxfYU" },
-            { id: 6, title: "Watch Video #6", url: "https://youtu.be/I5mLBbsuAdA?si=VH2iyck33TTyj7I_" }
+            { url: "https://youtu.be/_hzf9W746hk?si=7EkyntxrRJyMRNUA" },
+            { url: "https://youtu.be/p3AlcT7qGGM?si=ehkyBtHuyYblyS9s" },
+            { url: "https://youtu.be/CCDFnBjzbPM?si=SQP9MS-MCs7aofVG" },
+            { url: "https://youtu.be/unTAEBvggus?si=7vD8UkvwIdN7VO03" },
+            { url: "https://youtu.be/Hja_iwEkfmI?si=ZXUMVXyM17bBxfYU" },
+            { url: "https://youtu.be/I5mLBbsuAdA?si=VH2iyck33TTyj7I_" }
         ];
 
-        // Shuffle function
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -127,29 +106,48 @@
             }
         }
 
-        // Shuffle karke shuru ke 3 links nikalna
-        shuffleArray(videoPool);
-        const selectedVideos = videoPool.slice(0, 3);
+        // Check 24-hour expiry using LocalStorage
+        let lastResetTime = localStorage.getItem('last_reset_time');
+        let currentTime = new Date().getTime();
+        const twentyFourHours = 24 * 60 * 60 * 1000;
 
-        // HTML me 3 tasks dikhana
+        if (!lastResetTime || (currentTime - lastResetTime > twentyFourHours)) {
+            shuffleArray(videoPool);
+            // Save randomized 3 videos and reset task completion status
+            localStorage.setItem('todays_videos', JSON.stringify(videoPool.slice(0, 3)));
+            localStorage.setItem('last_reset_time', currentTime);
+            localStorage.setItem('completed_tasks', JSON.stringify([]));
+        }
+
+        let selectedVideos = JSON.parse(localStorage.getItem('todays_videos'));
+        let completedTasks = JSON.parse(localStorage.getItem('completed_tasks')) || [];
+
+        updateDisplay();
+
         const taskContainer = document.getElementById('task-container');
-        selectedVideos.forEach((video) => {
-            const taskHTML = `
+        
+        // Render tasks with fixed 1, 2, 3 sequence
+        selectedVideos.forEach((video, index) => {
+            let taskId = index + 1; // Hamesha 1, 2, 3 hi rahega
+            let isDone = completedTasks.includes(taskId);
+
+            taskContainer.innerHTML += `
                 <div class="task-card">
                     <div class="task-info">
-                        <h3>${video.title}</h3>
+                        <h3>Watch Video #${taskId}</h3>
                         <p>+ 100 GALAXY ($0.01)</p>
                     </div>
-                    <button class="watch-btn" id="btn${video.id}" onclick="startTask(${video.id}, '${video.url}', 100)">WATCH</button>
+                    <button class="watch-btn" id="btn${taskId}" onclick="startTask(${taskId}, '${video.url}', 100)" ${isDone ? 'disabled' : ''}>
+                        ${isDone ? 'DONE' : 'WATCH'}
+                    </button>
                 </div>
             `;
-            taskContainer.innerHTML += taskHTML;
         });
 
         function updateDisplay() {
             document.getElementById('balance').innerText = galaxyBalance;
-            let usdtValue = (galaxyBalance * usdtRate).toFixed(2);
-            document.getElementById('usdt-balance').innerText = `≈ $${usdtValue} USDT`;
+            document.getElementById('usdt-balance').innerText = `≈ $${(galaxyBalance * usdtRate).toFixed(2)} USDT`;
+            localStorage.setItem('galaxy_balance', galaxyBalance);
         }
 
         function startTask(taskId, videoUrl, reward) {
@@ -161,17 +159,22 @@
             setTimeout(() => {
                 galaxyBalance += reward;
                 updateDisplay();
+
+                // Save task as completed
+                completedTasks.push(taskId);
+                localStorage.setItem('completed_tasks', JSON.stringify(completedTasks));
+
                 btn.innerText = 'DONE';
                 tg.HapticFeedback.notificationOccurred('success');
-            }, 15000); 
+
+                // Custom Popup Alert as requested
+                tg.showAlert(`🎉 Congratulations! Your task is done and you got 100 GALAXY ($0.01)`);
+            }, 10000); 
         }
 
-        function requestWithdraw() {
-            if(galaxyBalance < 700) {
-                tg.showAlert('❌ Minimum withdrawal is 700 GALAXY ($0.07 USDT). Earn more to withdraw!');
-            } else {
-                tg.showAlert('✅ Balance is sufficient. Setup your BSC BEP-20 address in the Bot to receive Auto-Pay!');
-            }
+        function syncBalanceToBot() {
+            tg.sendData(String(galaxyBalance));
+            tg.showAlert('✅ Balance synced successfully to your Telegram Bot!');
         }
     </script>
 </body>
