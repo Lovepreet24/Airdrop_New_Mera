@@ -1,509 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
 
-    <title>USDT Galaxy - Earn Studio</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <title>USDT Galaxy</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #05070d;
+      color: white;
+      font-family: Arial, sans-serif;
+      user-select: none;
+    }
+
+    .card {
+      background: linear-gradient(
+        145deg,
+        rgba(20, 25, 40, 0.95),
+        rgba(8, 11, 20, 0.95)
+      );
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+    }
+
+    .earn-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      font-weight: bold;
+      background: #2563eb;
+      margin-top: 10px;
+    }
+
+    .earn-btn:disabled {
+      opacity: 0.5;
+    }
+  </style>
 </head>
 
-<body class="bg-[#0f0c1b] text-white min-h-screen flex flex-col items-center p-4">
+<body>
 
-    <div class="w-full max-w-md bg-[#1a1533] rounded-2xl p-6 shadow-xl border border-purple-900/50 mt-4 text-center">
+  <div class="max-w-md mx-auto p-4">
 
-        <h1 class="text-xl font-bold tracking-wider text-purple-300 mb-2">
-            GALAXY EARN STUDIO
-        </h1>
-
-        <p class="text-xs text-gray-400 uppercase tracking-widest mt-4">
-            Total Balance
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <h1 class="text-2xl font-bold">🌌 USDT Galaxy</h1>
+        <p class="text-gray-400 text-sm">
+          Watch & Earn
         </p>
+      </div>
 
-        <div
-            id="balanceDisplay"
-            class="text-4xl font-extrabold text-purple-200 my-2"
-        >
-            Loading...
-        </div>
-
-        <div class="text-sm text-green-400 font-medium mb-6">
-            ≈ $<span id="usdtDisplay">0.00</span> USDT
-        </div>
+      <div id="statusDot" class="text-green-400 text-sm">
+        ● Online
+      </div>
+    </div>
 
 
-        <!-- ================= VIDEO 1 ================= -->
+    <!-- BALANCE -->
 
-        <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30 mb-3">
+    <div class="card p-5 mb-5">
 
-            <div class="text-left">
-                <p class="font-semibold text-sm">
-                    Watch Video #1
-                </p>
+      <p class="text-gray-400 text-sm">
+        Your Galaxy Balance
+      </p>
 
-                <p class="text-xs text-purple-300">
-                    +100 GALAXY ($0.01)
-                </p>
-            </div>
+      <div
+        id="balance"
+        class="text-4xl font-bold mt-2"
+      >
+        Loading...
+      </div>
 
-            <button
-                onclick="watchYouTube(
-                    'https://youtu.be/unTAEBvggus',
-                    'video1',
-                    this
-                )"
-                class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
-            >
-                WATCH
-            </button>
+      <p class="text-gray-400 mt-2">
+        GALAXY
+      </p>
 
-        </div>
-
-
-        <!-- ================= VIDEO 2 ================= -->
-
-        <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30 mb-3">
-
-            <div class="text-left">
-                <p class="font-semibold text-sm">
-                    Watch Video #2
-                </p>
-
-                <p class="text-xs text-purple-300">
-                    +100 GALAXY ($0.01)
-                </p>
-            </div>
-
-            <button
-                onclick="watchYouTube(
-                    'https://youtu.be/Hja_iwEkfmI',
-                    'video2',
-                    this
-                )"
-                class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
-            >
-                WATCH
-            </button>
-
-        </div>
-
-
-        <!-- ================= VIDEO 3 ================= -->
-
-        <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
-
-            <div class="text-left">
-                <p class="font-semibold text-sm">
-                    Watch Video #3
-                </p>
-
-                <p class="text-xs text-purple-300">
-                    +100 GALAXY ($0.01)
-                </p>
-            </div>
-
-            <button
-                onclick="watchYouTube(
-                    'https://youtu.be/I5mLBbsuAdA',
-                    'video3',
-                    this
-                )"
-                class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
-            >
-                WATCH
-            </button>
-
-        </div>
+      <div
+        id="usdtValue"
+        class="text-green-400 mt-2"
+      >
+        ≈ $0.00 USDT
+      </div>
 
     </div>
 
 
+    <!-- TASKS -->
+
+    <div class="card p-5">
+
+      <h2 class="text-xl font-bold mb-1">
+        🎬 Watch & Earn
+      </h2>
+
+      <p class="text-gray-400 text-sm mb-4">
+        Watch the video and earn 100 GALAXY.
+      </p>
+
+
+      <!-- VIDEO 1 -->
+
+      <div class="border border-gray-700 rounded-xl p-4 mb-4">
+
+        <div class="font-bold">
+          🎥 Galaxy Video #1
+        </div>
+
+        <div class="text-gray-400 text-sm mt-1">
+          Reward: +100 GALAXY
+        </div>
+
+        <button
+          id="video1Btn"
+          class="earn-btn"
+          onclick="watchYouTube(
+            'https://youtu.be/unTAEBvggus',
+            'video1',
+            this
+          )"
+        >
+          ▶️ Watch Video & Earn
+        </button>
+
+      </div>
+
+
+      <!-- VIDEO 2 -->
+
+      <div class="border border-gray-700 rounded-xl p-4 mb-4">
+
+        <div class="font-bold">
+          🎥 Galaxy Video #2
+        </div>
+
+        <div class="text-gray-400 text-sm mt-1">
+          Reward: +100 GALAXY
+        </div>
+
+        <button
+          id="video2Btn"
+          class="earn-btn"
+          onclick="watchYouTube(
+            'https://youtu.be/Hja_iwEkfmI',
+            'video2',
+            this
+          )"
+        >
+          ▶️ Watch Video & Earn
+        </button>
+
+      </div>
+
+
+      <!-- VIDEO 3 -->
+
+      <div class="border border-gray-700 rounded-xl p-4">
+
+        <div class="font-bold">
+          🎥 Galaxy Video #3
+        </div>
+
+        <div class="text-gray-400 text-sm mt-1">
+          Reward: +100 GALAXY
+        </div>
+
+        <button
+          id="video3Btn"
+          class="earn-btn"
+          onclick="watchYouTube(
+            'https://youtu.be/I5mLBbsuAdA',
+            'video3',
+            this
+          )"
+        >
+          ▶️ Watch Video & Earn
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- DEBUG -->
+
+    <div
+      id="debug"
+      class="text-xs text-gray-500 mt-5 break-all"
+    ></div>
+
+  </div>
+
+
 <script>
 
-/* =====================================================
-   RAILWAY BACKEND
-===================================================== */
+  // ==================================
+  // CONFIG
+  // ==================================
 
-const API =
+  const API =
     "https://usdtbot-production-89e9.up.railway.app";
 
 
-/* =====================================================
-   TELEGRAM MINI APP
-===================================================== */
+  // ==================================
+  // TELEGRAM
+  // ==================================
 
-const tg =
-    window.Telegram.WebApp;
+  const tg = window.Telegram.WebApp;
 
-tg.ready();
-tg.expand();
-
-
-/* =====================================================
-   BALANCE
-===================================================== */
-
-let currentBalance = 0;
+  tg.ready();
+  tg.expand();
 
 
-/* =====================================================
-   UPDATE UI
-===================================================== */
+  // ==================================
+  // ELEMENTS
+  // ==================================
 
-function updateUI() {
+  const balanceElement =
+    document.getElementById("balance");
 
-    document.getElementById(
-        "balanceDisplay"
-    ).innerText =
-        currentBalance + " GALAXY";
+  const usdtElement =
+    document.getElementById("usdtValue");
 
-    document.getElementById(
-        "usdtDisplay"
-    ).innerText =
-        (currentBalance * 0.0001).toFixed(2);
-}
+  const debugElement =
+    document.getElementById("debug");
 
 
-/* =====================================================
-   LOAD BALANCE FROM RAILWAY
-===================================================== */
+  // ==================================
+  // DEBUG INFO
+  // ==================================
 
-async function loadBalance() {
+  function showDebug(message) {
+    debugElement.innerText = message;
+  }
 
-    console.log(
-        "Telegram initData:",
-        tg.initData
+
+  function telegramSessionAvailable() {
+
+    return (
+      tg &&
+      typeof tg.initData === "string" &&
+      tg.initData.length > 0
+    );
+
+  }
+
+
+  // ==================================
+  // UPDATE BALANCE UI
+  // ==================================
+
+  function updateBalance(balance) {
+
+    const amount = Number(balance || 0);
+
+    balanceElement.innerText =
+      amount.toLocaleString();
+
+    const usdt =
+      (amount * 0.0001).toFixed(2);
+
+    usdtElement.innerText =
+      "≈ $" + usdt + " USDT";
+
+  }
+
+
+  // ==================================
+  // LOAD BALANCE
+  // ==================================
+
+  async function loadBalance() {
+
+    if (!telegramSessionAvailable()) {
+
+      balanceElement.innerText =
+        "Telegram Only";
+
+      usdtElement.innerText =
+        "Open this Mini App from the Telegram bot.";
+
+      showDebug(
+        "Telegram session missing. Open the app using the 🎬 Watch & Earn button inside @USDTGalaxyProRobot."
+      );
+
+      return;
+
+    }
+
+
+    showDebug(
+      "Telegram session detected. Loading balance..."
     );
 
 
-    if (!tg.initData) {
-
-        document.getElementById(
-            "balanceDisplay"
-        ).innerText =
-            "Open in Telegram";
-
-        return;
-    }
-
-
     try {
 
-        const response =
-            await fetch(
-                API + "/sync",
-                {
-                    method: "POST",
+      const response =
+        await fetch(API + "/sync", {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+          method: "POST",
 
-                    body: JSON.stringify({
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-                        initData:
-                            tg.initData
+          body: JSON.stringify({
+            initData: tg.initData
+          })
 
-                    })
-                }
-            );
+        });
 
 
-        const responseText =
-            await response.text();
+      const data =
+        await response.json();
 
 
-        console.log(
-            "SYNC status:",
-            response.status
+      if (!response.ok) {
+
+        console.error(data);
+
+        balanceElement.innerText =
+          "Error";
+
+        showDebug(
+          "Server error: " +
+          (data.error || response.status)
         );
 
-        console.log(
-            "SYNC response:",
-            responseText
+        return;
+
+      }
+
+
+      if (!data.success) {
+
+        balanceElement.innerText =
+          "Error";
+
+        showDebug(
+          "Sync failed: " +
+          (data.error || "Unknown error")
         );
 
+        return;
 
-        let data;
-
-        try {
-
-            data =
-                JSON.parse(responseText);
-
-        } catch {
-
-            throw new Error(
-                "Backend returned invalid response: " +
-                responseText
-            );
-        }
+      }
 
 
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.error ||
-                "Unable to load balance"
-            );
-        }
+      updateBalance(data.balance);
 
 
-        /*
-         * Database balance only.
-         */
-
-        currentBalance =
-            Number(data.balance) || 0;
-
-        updateUI();
-
-
-        console.log(
-            "✅ Balance loaded:",
-            currentBalance
-        );
-
+      showDebug(
+        "Balance synced successfully."
+      );
 
     } catch (error) {
 
-        console.error(
-            "❌ Balance loading error:",
-            error
-        );
+      console.error(error);
 
+      balanceElement.innerText =
+        "Offline";
 
-        document.getElementById(
-            "balanceDisplay"
-        ).innerText =
-            "ERROR";
+      showDebug(
+        "Backend connection failed."
+      );
 
-
-        alert(
-            "Balance error:\n\n" +
-            error.message
-        );
     }
-}
+
+  }
 
 
-/* =====================================================
-   WATCH + EARN
-===================================================== */
+  // ==================================
+  // WATCH YOUTUBE + EARN
+  // ==================================
 
-async function watchYouTube(
+  async function watchYouTube(
     videoUrl,
     taskId,
     button
-) {
+  ) {
 
-    /*
-     * Prevent double click.
-     */
+    if (!telegramSessionAvailable()) {
 
-    if (button.disabled) {
-        return;
+      tg.showAlert(
+        "Please open this Mini App from the Telegram bot."
+      );
+
+      return;
+
     }
 
-
-    /*
-     * Telegram check.
-     */
-
-    if (!tg.initData) {
-
-        alert(
-            "Telegram session missing.\n\n" +
-            "Please open this Mini App from Telegram."
-        );
-
-        return;
-    }
-
-
-    /*
-     * Disable button.
-     */
 
     button.disabled = true;
 
-
-    const originalText =
-        button.innerText;
-
-
     button.innerText =
-        "EARNING...";
+      "⏳ Processing...";
 
 
     try {
 
-        console.log(
-            "Starting task:",
-            taskId
+      /*
+       * First request reward from server.
+       *
+       * IMPORTANT:
+       * The frontend does NOT send balance
+       * or reward amount.
+       */
+
+      const response =
+        await fetch(API + "/earn", {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+
+            initData: tg.initData,
+
+            taskId: taskId
+
+          })
+
+        });
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok || !data.success) {
+
+        throw new Error(
+          data.error || "Reward failed"
         );
 
-
-        /*
-         * Send ONLY:
-         *
-         * initData
-         * taskId
-         *
-         * Server decides reward.
-         */
-
-        const response =
-            await fetch(
-                API + "/earn",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        initData:
-                            tg.initData,
-
-                        taskId:
-                            taskId
-
-                    })
-                }
-            );
+      }
 
 
-        const responseText =
-            await response.text();
+      // Update balance from server
+
+      updateBalance(data.balance);
 
 
-        console.log(
-            "EARN status:",
-            response.status
-        );
+      // Open YouTube
 
-        console.log(
-            "EARN response:",
-            responseText
-        );
+      if (tg.openLink) {
 
+        tg.openLink(videoUrl);
 
-        let data;
-
-        try {
-
-            data =
-                JSON.parse(responseText);
-
-        } catch {
-
-            throw new Error(
-                "Backend response:\n" +
-                responseText
-            );
-        }
-
-
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.error ||
-                "Unable to add reward"
-            );
-        }
-
-
-        /*
-         * New balance returned
-         * by Railway/Supabase.
-         */
-
-        currentBalance =
-            Number(data.balance) || 0;
-
-        updateUI();
-
-
-        console.log(
-            "✅ Reward added:",
-            data.reward
-        );
-
-        console.log(
-            "✅ New balance:",
-            currentBalance
-        );
-
-
-        /*
-         * Open YouTube after
-         * successful reward.
-         */
+      } else {
 
         window.open(
-            videoUrl,
-            "_blank"
+          videoUrl,
+          "_blank"
         );
 
+      }
 
-        /*
-         * Confirmation.
-         */
 
-        alert(
-            "+" +
-            data.reward +
-            " GALAXY added!\n\n" +
-            "New balance: " +
-            currentBalance +
-            " GALAXY"
-        );
+      button.innerText =
+        "✅ Earned +100 GALAXY";
+
+
+      showDebug(
+        "Reward added successfully. New balance: " +
+        data.balance
+      );
 
 
     } catch (error) {
 
-        console.error(
-            "❌ Earn error:",
-            error
-        );
+      console.error(error);
+
+      button.disabled = false;
+
+      button.innerText =
+        "▶️ Watch Video & Earn";
 
 
-        alert(
-            "Unable to add reward.\n\n" +
-            error.message
-        );
+      tg.showAlert(
+        "Reward failed. Please try again."
+      );
 
 
-    } finally {
+      showDebug(
+        "Earn error: " + error.message
+      );
 
-        button.disabled = false;
-
-        button.innerText =
-            originalText;
     }
-}
+
+  }
 
 
-/* =====================================================
-   INITIAL LOAD
-===================================================== */
+  // ==================================
+  // START
+  // ==================================
 
-loadBalance();
+  loadBalance();
 
 </script>
 
