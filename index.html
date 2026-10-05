@@ -4,97 +4,397 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USDT Galaxy - Earn Studio</title>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-[#0f0c1b] text-white min-h-screen flex flex-col items-center p-4">
-    
+
     <div class="w-full max-w-md bg-[#1a1533] rounded-2xl p-6 shadow-xl border border-purple-900/50 mt-4 text-center">
-        <h1 class="text-xl font-bold tracking-wider text-purple-300 mb-2">GALAXY EARN STUDIO</h1>
-        
-        <p class="text-xs text-gray-400 uppercase tracking-widest mt-4">Total Balance</p>
-        <div id="balanceDisplay" class="text-4xl font-extrabold text-purple-200 my-2">500</div>
-        <div class="text-sm text-green-400 font-medium mb-6">≈ $<span id="usdtDisplay">0.05</span> USDT</div>
-        
-        <!-- Task List with YouTube Links -->
-        <div class="space-y-3">
-            <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
-                <div class="text-left">
-                    <p class="font-semibold text-sm">Watch Video #1</p>
-                    <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
-                </div>
-                <button onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_1', 100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
-            </div>
-            
-            <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
-                <div class="text-left">
-                    <p class="font-semibold text-sm">Watch Video #2</p>
-                    <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
-                </div>
-                <button onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_2', 100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
-            </div>
-            
-            <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
-                <div class="text-left">
-                    <p class="font-semibold text-sm">Watch Video #3</p>
-                    <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
-                </div>
-                <button onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_3', 100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
-            </div>
+
+        <h1 class="text-xl font-bold tracking-wider text-purple-300 mb-2">
+            GALAXY EARN STUDIO
+        </h1>
+
+        <p class="text-xs text-gray-400 uppercase tracking-widest mt-4">
+            Total Balance
+        </p>
+
+        <div
+            id="balanceDisplay"
+            class="text-4xl font-extrabold text-purple-200 my-2"
+        >
+            Loading...
         </div>
+
+        <div class="text-sm text-green-400 font-medium mb-6">
+            ≈ $<span id="usdtDisplay">0.00</span> USDT
+        </div>
+
+
+        <!-- VIDEO 1 -->
+        <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30 mb-3">
+
+            <div class="text-left">
+                <p class="font-semibold text-sm">
+                    Watch Video #1
+                </p>
+
+                <p class="text-xs text-purple-300">
+                    +100 GALAXY ($0.01)
+                </p>
+            </div>
+
+            <button
+                onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_1', 'video1', this)"
+                class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
+            >
+                WATCH
+            </button>
+
+        </div>
+
+
+        <!-- VIDEO 2 -->
+        <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30 mb-3">
+
+            <div class="text-left">
+                <p class="font-semibold text-sm">
+                    Watch Video #2
+                </p>
+
+                <p class="text-xs text-purple-300">
+                    +100 GALAXY ($0.01)
+                </p>
+            </div>
+
+            <button
+                onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_2', 'video2', this)"
+                class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
+            >
+                WATCH
+            </button>
+
+        </div>
+
+
+        <!-- VIDEO 3 -->
+        <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
+
+            <div class="text-left">
+                <p class="font-semibold text-sm">
+                    Watch Video #3
+                </p>
+
+                <p class="text-xs text-purple-300">
+                    +100 GALAXY ($0.01)
+                </p>
+            </div>
+
+            <button
+                onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_3', 'video3', this)"
+                class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
+            >
+                WATCH
+            </button>
+
+        </div>
+
     </div>
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        
-        // Telegram से सही User ID पकड़ने का सटीक तरीका
-        let userId = tg.initDataUnsafe?.user?.id;
-        const urlParams = new URLSearchParams(window.location.search);
-        if (!userId) {
-            userId = urlParams.get('userid');
+
+<script>
+
+const API =
+    'https://usdtbot-production-89e9.up.railway.app';
+
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+
+/* ============================
+   TELEGRAM USER
+============================ */
+
+const telegramUser =
+    tg.initDataUnsafe?.user;
+
+const userId =
+    telegramUser?.id;
+
+
+/*
+ * IMPORTANT:
+ * Balance localStorage se nahi aayega.
+ * Database is the source of truth.
+ */
+
+
+/* ============================
+   CURRENT BALANCE
+============================ */
+
+let currentBalance = 0;
+
+
+/* ============================
+   UPDATE UI
+============================ */
+
+function updateUI() {
+
+    document.getElementById(
+        'balanceDisplay'
+    ).innerText = currentBalance;
+
+    document.getElementById(
+        'usdtDisplay'
+    ).innerText =
+        (currentBalance * 0.0001).toFixed(2);
+}
+
+
+/* ============================
+   LOAD BALANCE FROM RAILWAY
+============================ */
+
+async function loadBalance() {
+
+    try {
+
+        /*
+         * Telegram Mini App must provide
+         * authenticated initData.
+         */
+
+        if (!tg.initData) {
+
+            document.getElementById(
+                'balanceDisplay'
+            ).innerText = 'Open in Telegram';
+
+            console.error(
+                'Telegram initData is missing.'
+            );
+
+            return;
         }
 
-        let currentBalance = parseInt(localStorage.getItem('galaxy_balance')) || 500;
+
+        const response =
+            await fetch(`${API}/sync`, {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+
+                body: JSON.stringify({
+
+                    initData:
+                        tg.initData
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.error ||
+                'Unable to load balance'
+            );
+        }
+
+
+        /*
+         * SUPABASE BALANCE
+         *
+         * This is now the ONLY balance
+         * displayed by the Mini App.
+         */
+
+        currentBalance =
+            Number(data.balance) || 0;
+
         updateUI();
 
-        function updateUI() {
-            document.getElementById('balanceDisplay').innerText = currentBalance;
-            document.getElementById('usdtDisplay').innerText = (currentBalance * 0.0001).toFixed(2);
+
+        console.log(
+            '✅ Balance loaded:',
+            currentBalance
+        );
+
+    } catch (error) {
+
+        console.error(
+            '❌ Balance loading error:',
+            error
+        );
+
+        document.getElementById(
+            'balanceDisplay'
+        ).innerText = 'Error';
+
+    }
+}
+
+
+/* ============================
+   WATCH & EARN
+============================ */
+
+async function watchYouTube(
+    videoUrl,
+    taskId,
+    button
+) {
+
+    /*
+     * Open YouTube video
+     */
+
+    window.open(
+        videoUrl,
+        '_blank'
+    );
+
+
+    /*
+     * Prevent multiple clicks
+     */
+
+    if (button.disabled) {
+        return;
+    }
+
+    button.disabled = true;
+
+    const originalText =
+        button.innerText;
+
+    button.innerText =
+        'EARNING...';
+
+
+    try {
+
+        if (!tg.initData) {
+
+            throw new Error(
+                'Telegram session missing'
+            );
         }
 
-        function watchYouTube(videoUrl, amount) {
-            window.open(videoUrl, '_blank');
-            
-            currentBalance += amount;
-            localStorage.setItem('galaxy_balance', currentBalance);
-            updateUI();
-            syncWithBackend(currentBalance);
+
+        /*
+         * IMPORTANT:
+         *
+         * We DO NOT send:
+         *
+         * balance: 3500
+         *
+         * Frontend cannot choose
+         * the balance anymore.
+         *
+         * We only send taskId.
+         */
+
+        const response =
+            await fetch(`${API}/earn`, {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+
+                body: JSON.stringify({
+
+                    initData:
+                        tg.initData,
+
+                    taskId:
+                        taskId
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.error ||
+                'Reward failed'
+            );
         }
 
-        async function syncWithBackend(newBalance) {
-            if (!userId) {
-                console.error('User ID missing, cannot sync!');
-                return;
-            }
-            try {
-                let response = await fetch('https://usdtbot-production-89e9.up.railway.app/sync', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userId: userId, balance: newBalance })
-                });
-                let data = await response.json();
-                console.log('Synced successfully:', data);
-            } catch (error) {
-                console.error('Error linking to Railway:', error);
-            }
-        }
-        
-        if (userId) {
-            syncWithBackend(currentBalance);
-        }
-    </script>
+
+        /*
+         * Railway/Supabase returns
+         * the new real balance.
+         */
+
+        currentBalance =
+            Number(data.balance) || 0;
+
+        updateUI();
+
+
+        console.log(
+            '✅ Reward:',
+            data.earned,
+            'New balance:',
+            currentBalance
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            '❌ Earn error:',
+            error
+        );
+
+        alert(
+            'Unable to add reward. Please try again.'
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerText =
+            originalText;
+    }
+}
+
+
+/* ============================
+   INITIAL LOAD
+============================ */
+
+loadBalance();
+
+</script>
+
 </body>
 </html>
