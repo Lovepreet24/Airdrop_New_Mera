@@ -16,14 +16,14 @@
         <div id="balanceDisplay" class="text-4xl font-extrabold text-purple-200 my-2">500</div>
         <div class="text-sm text-green-400 font-medium mb-6">≈ $<span id="usdtDisplay">0.05</span> USDT</div>
         
-        <!-- Task List -->
+        <!-- Task List with YouTube Links -->
         <div class="space-y-3">
             <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
                 <div class="text-left">
                     <p class="font-semibold text-sm">Watch Video #1</p>
                     <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
                 </div>
-                <button onclick="earnTokens(100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
+                <button onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_1', 100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
             </div>
             
             <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
@@ -31,7 +31,7 @@
                     <p class="font-semibold text-sm">Watch Video #2</p>
                     <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
                 </div>
-                <button onclick="earnTokens(100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
+                <button onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_2', 100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
             </div>
             
             <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
@@ -39,7 +39,7 @@
                     <p class="font-semibold text-sm">Watch Video #3</p>
                     <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
                 </div>
-                <button onclick="earnTokens(100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
+                <button onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_3', 100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
             </div>
         </div>
     </div>
@@ -48,11 +48,11 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         
-        // Telegram se User ID nikalna
+        // Telegram से सही User ID पकड़ने का सटीक तरीका
         let userId = tg.initDataUnsafe?.user?.id;
         const urlParams = new URLSearchParams(window.location.search);
         if (!userId) {
-            userId = urlParams.get('userid') || '123456789';
+            userId = urlParams.get('userid');
         }
 
         let currentBalance = parseInt(localStorage.getItem('galaxy_balance')) || 500;
@@ -63,7 +63,9 @@
             document.getElementById('usdtDisplay').innerText = (currentBalance * 0.0001).toFixed(2);
         }
 
-        function earnTokens(amount) {
+        function watchYouTube(videoUrl, amount) {
+            window.open(videoUrl, '_blank');
+            
             currentBalance += amount;
             localStorage.setItem('galaxy_balance', currentBalance);
             updateUI();
@@ -71,6 +73,10 @@
         }
 
         async function syncWithBackend(newBalance) {
+            if (!userId) {
+                console.error('User ID missing, cannot sync!');
+                return;
+            }
             try {
                 let response = await fetch('https://usdtbot-production-89e9.up.railway.app/sync', {
                     method: 'POST',
@@ -86,8 +92,9 @@
             }
         }
         
-        // App khulte hi automatic sync karega
-        syncWithBackend(currentBalance);
+        if (userId) {
+            syncWithBackend(currentBalance);
+        }
     </script>
 </body>
 </html>
