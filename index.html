@@ -570,8 +570,6 @@
       </div>
 
 
-      <!-- VIDEO 1 -->
-
       <div class="card">
 
         <b>🎥 Video Task 1</b>
@@ -603,8 +601,6 @@
       </div>
 
 
-      <!-- VIDEO 2 -->
-
       <div class="card">
 
         <b>🎥 Video Task 2</b>
@@ -635,8 +631,6 @@
 
       </div>
 
-
-      <!-- VIDEO 3 -->
 
       <div class="card">
 
@@ -692,7 +686,6 @@
           for every valid referral.
         </p>
 
-
         <div class="stat">
 
           <div class="muted">
@@ -708,13 +701,11 @@
 
         </div>
 
-
         <input
           id="referralLink"
           class="input"
           readonly
         >
-
 
         <button
           class="btn"
@@ -722,7 +713,6 @@
         >
           📋 Copy Link
         </button>
-
 
         <button
           class="btn secondary"
@@ -770,7 +760,6 @@
             US
           </div>
 
-
           <div>
 
             <div
@@ -799,7 +788,7 @@
       <div class="card">
 
         <div style="font-size:19px;font-weight:bold;">
-          💳 Manual Payout
+          💳 USDT Payout
         </div>
 
         <p
@@ -810,7 +799,6 @@
           700 GALAXY ($0.07 USDT)
         </p>
 
-
         <input
           id="payoutAmount"
           class="input"
@@ -819,13 +807,11 @@
           placeholder="GALAXY amount"
         >
 
-
         <input
           id="wallet"
           class="input"
-          placeholder="USDT wallet address"
+          placeholder="BSC USDT wallet address"
         >
-
 
         <button
           id="payoutBtn"
@@ -885,7 +871,6 @@
       🏠<br>Home
     </button>
 
-
     <button
       id="navEarn"
       onclick="showPage('earn')"
@@ -893,14 +878,12 @@
       🎬<br>Earn
     </button>
 
-
     <button
       id="navReferral"
       onclick="showPage('referral')"
     >
       👥<br>Invite
     </button>
-
 
     <button
       id="navProfile"
@@ -914,8 +897,6 @@
 </div>
 
 
-<!-- ================= JAVASCRIPT ================= -->
-
 <script>
 
 const API =
@@ -924,41 +905,30 @@ const API =
 const BOT =
   "USDTGalaxyProRobot";
 
-
 const tg =
   window.Telegram &&
   window.Telegram.WebApp
     ? window.Telegram.WebApp
     : null;
 
-
 let user = null;
-
 let balance = 0;
-
 let earned = 0;
-
 let referralCount = 0;
-
 let verified = false;
-
 let checking = false;
-
 let minimumWithdrawal = 700;
-
 let referralReward = 100;
-
 let taskData = {};
-
 let timerIntervals = {};
 
 
-/* ================= TELEGRAM INIT ================= */
+/* ============================================================
+   TELEGRAM INIT
+   ============================================================ */
 
 if (tg) {
-
   tg.ready();
-
   tg.expand();
 
   user =
@@ -966,48 +936,40 @@ if (tg) {
     tg.initDataUnsafe.user
       ? tg.initDataUnsafe.user
       : null;
-
 }
 
 
-/* ================= USER UI ================= */
+/* ============================================================
+   USER UI
+   ============================================================ */
 
 function updateUser() {
 
-  if (!user) {
-    return;
-  }
-
+  if (!user) return;
 
   const firstName =
     user.first_name ||
     "Galaxy User";
-
 
   const username =
     user.username
       ? "@" + user.username
       : "Telegram User";
 
-
   document.getElementById(
     "welcome"
   ).innerText =
-    "Welcome, " +
-    firstName;
-
+    "Welcome, " + firstName;
 
   document.getElementById(
     "profileName"
   ).innerText =
     firstName;
 
-
   document.getElementById(
     "profileUsername"
   ).innerText =
     username;
-
 
   const initials =
     firstName
@@ -1017,12 +979,10 @@ function updateUser() {
       .slice(0, 2)
       .toUpperCase();
 
-
   document.getElementById(
     "avatar"
   ).innerText =
     initials;
-
 
   document.getElementById(
     "referralLink"
@@ -1031,11 +991,12 @@ function updateUser() {
     BOT +
     "?start=" +
     user.id;
-
 }
 
 
-/* ================= API ================= */
+/* ============================================================
+   API
+   ============================================================ */
 
 async function api(
   endpoint,
@@ -1058,20 +1019,14 @@ async function api(
       }
     );
 
-
-  let result;
+  let result = {};
 
   try {
-
     result =
       await response.json();
-
   } catch (_) {
-
     result = {};
-
   }
-
 
   if (!response.ok) {
 
@@ -1086,23 +1041,19 @@ async function api(
       result;
 
     throw error;
-
   }
 
-
   return result;
-
 }
 
 
-/* ================= CHECK CHANNELS ================= */
+/* ============================================================
+   CHECK CHANNELS
+   ============================================================ */
 
 async function checkChannels() {
 
-  if (checking) {
-    return;
-  }
-
+  if (checking) return;
 
   if (
     !tg ||
@@ -1115,30 +1066,23 @@ async function checkChannels() {
       "❌ Telegram session not available. Open the Mini App from the bot.";
 
     return;
-
   }
 
-
   checking = true;
-
 
   const button =
     document.getElementById(
       "checkBtn"
     );
 
-
   button.disabled = true;
-
   button.innerText =
     "⏳ Checking...";
-
 
   document.getElementById(
     "gateStatus"
   ).innerText =
     "Checking channel membership...";
-
 
   try {
 
@@ -1151,25 +1095,38 @@ async function checkChannels() {
         }
       );
 
+    console.log(
+      "VERIFY RESPONSE:",
+      result
+    );
+
+
+    /*
+      BACKEND RETURNS:
+
+      {
+        ok: true,
+        mainJoined: true,
+        paymentJoined: true
+      }
+
+      So frontend must read those exact fields.
+    */
 
     const mainJoined =
       result &&
-      result.main &&
-      result.main.joined === true;
-
+      result.mainJoined === true;
 
     const paymentJoined =
       result &&
-      result.payments &&
-      result.payments.joined === true;
-
+      result.paymentJoined === true;
 
     const allJoined =
-      result &&
-      result.joined === true &&
       mainJoined &&
       paymentJoined;
 
+
+    /* MAIN CHANNEL */
 
     if (mainJoined) {
 
@@ -1188,14 +1145,16 @@ async function checkChannels() {
       document.getElementById(
         "mainStatus"
       ).innerText =
-        (
-          result.main &&
-          result.main.status
-        ) ||
         "Not joined";
 
+      document.getElementById(
+        "mainStatus"
+      ).className =
+        "muted";
     }
 
+
+    /* PAYMENT CHANNEL */
 
     if (paymentJoined) {
 
@@ -1214,31 +1173,30 @@ async function checkChannels() {
       document.getElementById(
         "paymentStatus"
       ).innerText =
-        (
-          result.payments &&
-          result.payments.status
-        ) ||
         "Not joined";
 
+      document.getElementById(
+        "paymentStatus"
+      ).className =
+        "muted";
     }
 
+
+    /* BOTH JOINED */
 
     if (allJoined) {
 
       verified = true;
-
 
       document.getElementById(
         "gateStatus"
       ).innerText =
         "✅ Both channels verified successfully.";
 
-
       document.getElementById(
         "gateStatus"
       ).className =
         "status green";
-
 
       document.getElementById(
         "continueBtn"
@@ -1246,6 +1204,10 @@ async function checkChannels() {
         "hidden"
       );
 
+      document.getElementById(
+        "verifyDot"
+      ).innerText =
+        "● Verified";
 
       if (
         tg.HapticFeedback
@@ -1255,25 +1217,21 @@ async function checkChannels() {
           .impactOccurred(
             "light"
           );
-
       }
 
     } else {
 
       verified = false;
 
-
       document.getElementById(
         "gateStatus"
       ).innerText =
         "❌ Please join both channels and check again.";
 
-
       document.getElementById(
         "gateStatus"
       ).className =
         "status red";
-
     }
 
   } catch (error) {
@@ -1283,20 +1241,16 @@ async function checkChannels() {
       error
     );
 
-
     document.getElementById(
       "gateStatus"
     ).innerText =
       "❌ Verification failed. Please try again.";
 
-
     document.getElementById(
       "gateStatus"
     ).className =
       "status red";
-
   }
-
 
   button.disabled = false;
 
@@ -1304,15 +1258,14 @@ async function checkChannels() {
     "🔍 Check Membership";
 
   checking = false;
-
 }
 
 
-/* ================= OPEN TELEGRAM ================= */
+/* ============================================================
+   OPEN TELEGRAM
+   ============================================================ */
 
-function openTelegram(
-  url
-) {
+function openTelegram(url) {
 
   if (
     tg &&
@@ -1320,9 +1273,7 @@ function openTelegram(
       "function"
   ) {
 
-    tg.openTelegramLink(
-      url
-    );
+    tg.openTelegramLink(url);
 
   } else {
 
@@ -1330,13 +1281,13 @@ function openTelegram(
       url,
       "_blank"
     );
-
   }
-
 }
 
 
-/* ================= UNLOCK ================= */
+/* ============================================================
+   UNLOCK
+   ============================================================ */
 
 async function unlockApp() {
 
@@ -1347,15 +1298,12 @@ async function unlockApp() {
     );
 
     return;
-
   }
-
 
   document.getElementById(
     "gate"
   ).style.display =
     "none";
-
 
   document.getElementById(
     "app"
@@ -1363,25 +1311,21 @@ async function unlockApp() {
     "hidden"
   );
 
-
   document.getElementById(
     "bottomNav"
   ).classList.remove(
     "hidden"
   );
 
-
-  showPage(
-    "home"
-  );
-
+  showPage("home");
 
   await syncUser();
-
 }
 
 
-/* ================= SYNC ================= */
+/* ============================================================
+   SYNC
+   ============================================================ */
 
 async function syncUser() {
 
@@ -1391,7 +1335,6 @@ async function syncUser() {
   ) {
     return;
   }
-
 
   try {
 
@@ -1404,32 +1347,47 @@ async function syncUser() {
         }
       );
 
+    console.log(
+      "SYNC RESPONSE:",
+      result
+    );
 
-    if (!result) {
-      return;
-    }
+    if (!result) return;
 
 
-    /* BALANCE */
+    /*
+      Backend currently returns:
+
+      {
+        ok: true,
+        user: {
+          balance: ...
+        }
+      }
+    */
+
+    const backendUser =
+      result.user ||
+      {};
 
     updateBalance(
-      result.balance
+      backendUser.balance ||
+      result.balance ||
+      0
     );
 
 
-    /* REFERRALS */
-
     referralCount =
       Number(
-        result.referrals || 0
+        result.referrals ||
+        backendUser.referrals ||
+        0
       );
-
 
     document.getElementById(
       "referrals"
     ).innerText =
       referralCount.toLocaleString();
-
 
     document.getElementById(
       "referralBig"
@@ -1437,14 +1395,11 @@ async function syncUser() {
       referralCount.toLocaleString();
 
 
-    /* REWARDS */
-
     referralReward =
       Number(
         result.referralReward ||
         100
       );
-
 
     minimumWithdrawal =
       Number(
@@ -1452,8 +1407,6 @@ async function syncUser() {
         700
       );
 
-
-    /* MINIMUM WITHDRAWAL UI */
 
     const minUsdt =
       (
@@ -1495,61 +1448,31 @@ async function syncUser() {
       minimumWithdrawal +
       " GALAXY";
 
-
-    /* YOUTUBE TASKS */
-
-    if (
-      Array.isArray(
-        result.tasks
-      )
-    ) {
-
-      taskData = {};
-
-      result.tasks.forEach(
-        task => {
-
-          taskData[
-            task.id
-          ] = task;
-
-        }
-      );
-
-
-      updateTaskButtons();
-
-    }
-
   } catch (error) {
 
     console.error(
       "SYNC ERROR:",
       error
     );
-
   }
-
 }
 
 
-/* ================= BALANCE ================= */
+/* ============================================================
+   BALANCE
+   ============================================================ */
 
 function updateBalance(
   value
 ) {
 
   balance =
-    Number(
-      value || 0
-    );
-
+    Number(value || 0);
 
   document.getElementById(
     "balance"
   ).innerText =
     balance.toLocaleString();
-
 
   document.getElementById(
     "usdt"
@@ -1560,11 +1483,12 @@ function updateBalance(
       0.0001
     ).toFixed(2) +
     " USDT";
-
 }
 
 
-/* ================= NAVIGATION ================= */
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
 
 function showPage(
   page
@@ -1577,7 +1501,6 @@ function showPage(
     "profile"
   ];
 
-
   pages.forEach(
     name => {
 
@@ -1586,16 +1509,13 @@ function showPage(
           name
         );
 
-
       if (element) {
 
         element.classList.toggle(
           "active",
           name === page
         );
-
       }
-
     }
   );
 
@@ -1607,7 +1527,6 @@ function showPage(
     "Profile"
   ];
 
-
   navs.forEach(
     name => {
 
@@ -1616,16 +1535,14 @@ function showPage(
           "nav" + name
         );
 
-
       if (element) {
 
         element.classList.toggle(
           "active",
-          name.toLowerCase() === page
+          name.toLowerCase() ===
+            page
         );
-
       }
-
     }
   );
 
@@ -1635,7 +1552,6 @@ function showPage(
   ) {
 
     loadPayoutHistory();
-
   }
 
 
@@ -1643,242 +1559,12 @@ function showPage(
     0,
     0
   );
-
 }
 
 
-/* ================= TASK BUTTONS ================= */
-
-function updateTaskButtons() {
-
-  const ids = [
-    "video1",
-    "video2",
-    "video3"
-  ];
-
-
-  ids.forEach(
-    taskId => {
-
-      const task =
-        taskData[
-          taskId
-        ];
-
-
-      const number =
-        taskId.replace(
-          "video",
-          ""
-        );
-
-
-      const button =
-        document.getElementById(
-          "task" + number
-        );
-
-
-      const timer =
-        document.getElementById(
-          "timer" + number
-        );
-
-
-      if (
-        !button ||
-        !timer ||
-        !task
-      ) {
-        return;
-      }
-
-
-      if (
-        task.available === true
-      ) {
-
-        button.disabled =
-          false;
-
-        button.innerText =
-          "▶️ Watch & Earn +100";
-
-        timer.classList.add(
-          "hidden"
-        );
-
-        if (
-          timerIntervals[
-            taskId
-          ]
-        ) {
-
-          clearInterval(
-            timerIntervals[
-              taskId
-            ]
-          );
-
-          delete timerIntervals[
-            taskId
-          ];
-
-        }
-
-      } else {
-
-        button.disabled =
-          true;
-
-        button.innerText =
-          "⏳ Available again in 24h";
-
-        timer.classList.remove(
-          "hidden"
-        );
-
-
-        startTaskCountdown(
-          taskId,
-          task.nextAvailableAt
-        );
-
-      }
-
-    }
-  );
-
-}
-
-
-/* ================= TASK COUNTDOWN ================= */
-
-function startTaskCountdown(
-  taskId,
-  nextAvailableAt
-) {
-
-  const number =
-    taskId.replace(
-      "video",
-      ""
-    );
-
-
-  const timer =
-    document.getElementById(
-      "timer" + number
-    );
-
-
-  if (!timer) {
-    return;
-  }
-
-
-  if (
-    timerIntervals[
-      taskId
-    ]
-  ) {
-
-    clearInterval(
-      timerIntervals[
-        taskId
-      ]
-    );
-
-  }
-
-
-  function tick() {
-
-    const remaining =
-      new Date(
-        nextAvailableAt
-      ).getTime() -
-      Date.now();
-
-
-    if (
-      remaining <= 0
-    ) {
-
-      clearInterval(
-        timerIntervals[
-          taskId
-        ]
-      );
-
-
-      timer.innerText =
-        "✅ Task available again!";
-
-
-      timer.classList.remove(
-        "hidden"
-      );
-
-
-      syncUser();
-
-      return;
-
-    }
-
-
-    const totalSeconds =
-      Math.ceil(
-        remaining / 1000
-      );
-
-
-    const hours =
-      Math.floor(
-        totalSeconds / 3600
-      );
-
-
-    const minutes =
-      Math.floor(
-        (
-          totalSeconds % 3600
-        ) / 60
-      );
-
-
-    const seconds =
-      totalSeconds % 60;
-
-
-    timer.innerText =
-      "⏳ Available in " +
-      String(hours).padStart(2, "0") +
-      ":" +
-      String(minutes).padStart(2, "0") +
-      ":" +
-      String(seconds).padStart(2, "0");
-
-  }
-
-
-  tick();
-
-
-  timerIntervals[
-    taskId
-  ] =
-    setInterval(
-      tick,
-      1000
-    );
-
-}
-
-
-/* ================= WATCH TASK ================= */
+/* ============================================================
+   WATCH TASK
+   ============================================================ */
 
 async function watchTask(
   url,
@@ -1893,36 +1579,11 @@ async function watchTask(
     );
 
     return;
-
   }
 
-
-  const task =
-    taskData[
-      taskId
-    ];
-
-
-  if (
-    task &&
-    task.available === false
-  ) {
-
-    alert(
-      "This task is still on cooldown."
-    );
-
-    return;
-
-  }
-
-
-  button.disabled =
-    true;
-
+  button.disabled = true;
   button.innerText =
     "⏳ Opening...";
-
 
   try {
 
@@ -1932,9 +1593,7 @@ async function watchTask(
         "function"
     ) {
 
-      tg.openLink(
-        url
-      );
+      tg.openLink(url);
 
     } else {
 
@@ -1942,7 +1601,6 @@ async function watchTask(
         url,
         "_blank"
       );
-
     }
 
 
@@ -1972,50 +1630,20 @@ async function watchTask(
       );
 
 
-    if (
-      result &&
-      result.success
-    ) {
+    if (result.ok) {
+
+      const reward =
+        Number(
+          result.reward ||
+          100
+        );
 
       updateBalance(
         result.balance
       );
 
-
-      const reward =
-        Number(
-          result.earned ||
-          100
-        );
-
-
-      earned +=
-        reward;
-
-
-      document.getElementById(
-        "earned"
-      ).innerText =
-        earned.toLocaleString();
-
-
-      document.getElementById(
-        "earnedUsdt"
-      ).innerText =
-        "$" +
-        (
-          earned *
-          0.0001
-        ).toFixed(2) +
-        " USDT";
-
-
       button.innerText =
         "⏳ Cooldown";
-
-
-      await syncUser();
-
 
       alert(
         "🎉 +" +
@@ -2028,12 +1656,13 @@ async function watchTask(
         " USDT) added!"
       );
 
+      await syncUser();
+
     } else {
 
       throw new Error(
         "Reward failed"
       );
-
     }
 
   } catch (error) {
@@ -2043,44 +1672,23 @@ async function watchTask(
       error
     );
 
-
-    /* Cooldown response */
-
-    if (
-      error.data &&
-      error.data.error ===
-        "TASK_COOLDOWN"
-    ) {
-
-      await syncUser();
-
-      alert(
-        "⏳ This task is on 24-hour cooldown."
-      );
-
-      return;
-
-    }
-
-
     button.disabled =
       false;
 
     button.innerText =
       "▶️ Watch & Earn +100";
 
-
     alert(
       error.message ||
       "Unable to claim reward."
     );
-
   }
-
 }
 
 
-/* ================= REFERRAL ================= */
+/* ============================================================
+   REFERRAL
+   ============================================================ */
 
 async function copyReferral() {
 
@@ -2088,7 +1696,6 @@ async function copyReferral() {
     document.getElementById(
       "referralLink"
     );
-
 
   try {
 
@@ -2111,9 +1718,7 @@ async function copyReferral() {
     alert(
       "✅ Referral link copied!"
     );
-
   }
-
 }
 
 
@@ -2124,10 +1729,8 @@ function shareReferral() {
       "referralLink"
     ).value;
 
-
   const text =
     "🚀 Join USDT Galaxy and start earning GALAXY!";
-
 
   const share =
     "https://t.me/share/url?url=" +
@@ -2139,15 +1742,15 @@ function shareReferral() {
       text
     );
 
-
   openTelegram(
     share
   );
-
 }
 
 
-/* ================= PAYOUT ================= */
+/* ============================================================
+   PAYOUT
+   ============================================================ */
 
 async function requestPayout() {
 
@@ -2158,18 +1761,15 @@ async function requestPayout() {
       ).value
     );
 
-
   const wallet =
     document.getElementById(
       "wallet"
     ).value.trim();
 
-
   const status =
     document.getElementById(
       "payoutStatus"
     );
-
 
   const button =
     document.getElementById(
@@ -2197,7 +1797,6 @@ async function requestPayout() {
     );
 
     return;
-
   }
 
 
@@ -2211,30 +1810,26 @@ async function requestPayout() {
     );
 
     return;
-
   }
 
 
   if (!wallet) {
 
     alert(
-      "Please enter your USDT wallet address."
+      "Please enter your BSC USDT wallet address."
     );
 
     return;
-
   }
 
 
-  button.disabled =
-    true;
+  button.disabled = true;
 
   button.innerText =
-    "⏳ Submitting...";
-
+    "⏳ Processing...";
 
   status.innerText =
-    "Submitting withdrawal request...";
+    "Sending USDT payout...";
 
 
   try {
@@ -2256,49 +1851,80 @@ async function requestPayout() {
 
 
     if (
-      result &&
-      result.success
+      result.ok
     ) {
 
       updateBalance(
-        result.balance
+        Math.max(
+          0,
+          balance - amount
+        )
       );
 
 
       document.getElementById(
         "payoutAmount"
-      ).value =
-        "";
-
+      ).value = "";
 
       document.getElementById(
         "wallet"
-      ).value =
-        "";
+      ).value = "";
 
 
-      status.innerText =
-        "✅ Payout request submitted. Status: Pending";
+      if (
+        result.status ===
+        "paid"
+      ) {
 
-      status.className =
-        "status green";
+        status.innerText =
+          "✅ Paid automatically!";
+
+        status.className =
+          "status green";
 
 
-      alert(
-        "✅ Payout request submitted!\n\n" +
-        amount +
-        " GALAXY ($" +
-        (
-          amount *
-          0.0001
-        ).toFixed(2) +
-        " USDT)\n\n" +
-        "Your request will be processed manually."
-      );
+        alert(
+          "✅ USDT payout successful!\n\n" +
+          amount +
+          " GALAXY ($" +
+          Number(
+            result.usdtAmount ||
+            amount * 0.0001
+          ).toFixed(6) +
+          " USDT)\n\n" +
+          "TX Hash:\n" +
+          result.txHash
+        );
+
+      } else {
+
+        status.innerText =
+          "⏳ Withdrawal submitted.";
+
+        status.className =
+          "status yellow";
+
+
+        alert(
+          "⏳ Withdrawal submitted.\n\n" +
+          amount +
+          " GALAXY ($" +
+          (
+            amount * 0.0001
+          ).toFixed(2) +
+          " USDT)"
+        );
+      }
 
 
       await loadPayoutHistory();
 
+    } else {
+
+      throw new Error(
+        result.error ||
+        "Payout failed."
+      );
     }
 
   } catch (error) {
@@ -2308,41 +1934,12 @@ async function requestPayout() {
       error
     );
 
-
-    let message =
-      error.message ||
-      "Payout failed.";
-
-
-    if (
-      error.data &&
-      error.data.error ===
-        "INSUFFICIENT_BALANCE"
-    ) {
-
-      message =
-        "Insufficient balance.";
-
-    }
-
-
-    if (
-      error.data &&
-      error.data.error ===
-        "MIN_WITHDRAWAL"
-    ) {
-
-      message =
-        "Minimum withdrawal is " +
-        minimumWithdrawal +
-        " GALAXY.";
-
-    }
-
-
     status.innerText =
       "❌ " +
-      message;
+      (
+        error.message ||
+        "Payout failed."
+      );
 
     status.className =
       "status red";
@@ -2350,9 +1947,11 @@ async function requestPayout() {
 
     alert(
       "❌ " +
-      message
+      (
+        error.message ||
+        "Payout failed."
+      )
     );
-
   }
 
 
@@ -2361,11 +1960,12 @@ async function requestPayout() {
 
   button.innerText =
     "💰 Request Payout";
-
 }
 
 
-/* ================= PAYOUT HISTORY ================= */
+/* ============================================================
+   PAYOUT HISTORY
+   ============================================================ */
 
 async function loadPayoutHistory() {
 
@@ -2376,12 +1976,10 @@ async function loadPayoutHistory() {
     return;
   }
 
-
   const container =
     document.getElementById(
       "payoutHistory"
     );
-
 
   try {
 
@@ -2407,12 +2005,10 @@ async function loadPayoutHistory() {
         "No payout history.";
 
       return;
-
     }
 
 
-    container.innerHTML =
-      "";
+    container.innerHTML = "";
 
 
     result.payouts.forEach(
@@ -2422,7 +2018,6 @@ async function loadPayoutHistory() {
           document.createElement(
             "div"
           );
-
 
         div.className =
           "small-card";
@@ -2443,31 +2038,34 @@ async function loadPayoutHistory() {
 
           statusClass =
             "green";
-
         }
 
 
         if (
+          status === "failed" ||
           status === "rejected"
         ) {
 
           statusClass =
             "red";
-
         }
+
+
+        const usdt =
+          Number(
+            payout.amount || 0
+          ) *
+          0.0001;
 
 
         div.innerHTML =
           "<b>" +
           Number(
-            payout.amount
+            payout.amount || 0
           ).toLocaleString() +
           " GALAXY</b> " +
-          "($"
-          +
-          Number(
-            payout.usdt || 0
-          ).toFixed(2) +
+          "($" +
+          usdt.toFixed(6) +
           " USDT)" +
           "<br>" +
           "<span class='" +
@@ -2478,19 +2076,36 @@ async function loadPayoutHistory() {
           "<br>" +
           "<span class='muted'>" +
           (
-            payout.createdAt
+            payout.created_at
               ? new Date(
-                  payout.createdAt
+                  payout.created_at
                 ).toLocaleString()
               : ""
           ) +
           "</span>";
 
 
+        if (
+          payout.tx_hash
+        ) {
+
+          div.innerHTML +=
+            "<br><span class='muted'>TX: " +
+            payout.tx_hash.slice(
+              0,
+              12
+            ) +
+            "..." +
+            payout.tx_hash.slice(
+              -8
+            ) +
+            "</span>";
+        }
+
+
         container.appendChild(
           div
         );
-
       }
     );
 
@@ -2503,18 +2118,17 @@ async function loadPayoutHistory() {
 
     container.innerText =
       "Unable to load payout history.";
-
   }
-
 }
 
 
-/* ================= START ================= */
+/* ============================================================
+   START
+   ============================================================ */
 
 function init() {
 
   updateUser();
-
 
   if (!tg) {
 
@@ -2524,7 +2138,6 @@ function init() {
       "❌ Please open this app inside Telegram.";
 
     return;
-
   }
 
 
@@ -2536,14 +2149,11 @@ function init() {
       "❌ Telegram session missing. Reopen the Mini App from the bot.";
 
     return;
-
   }
 
 
   checkChannels();
-
 }
-
 
 init();
 
