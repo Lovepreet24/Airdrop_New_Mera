@@ -28,13 +28,16 @@
         <p>💫 GALAXY</p>
     </div>
 
-    <h3 style="color: #c4b5fd; font-size: 16px; text-transform: uppercase;">📺 Daily Tasks (Refreshes in 1 min for testing)</h3>
+    <h3 style="color: #c4b5fd; font-size: 16px; text-transform: uppercase;">📺 Daily Tasks (Refreshes in 1 min)</h3>
     <div class="task-container" id="task-container"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); 
-        const userId = tg.initDataUnsafe?.user?.id; 
+        
+        // ID catch karne ka sabse solid tareeqa
+        const urlParams = new URLSearchParams(window.location.search);
+        let userId = tg.initDataUnsafe?.user?.id || urlParams.get('userid'); 
 
         let galaxyBalance = parseInt(localStorage.getItem('galaxy_balance')) || 500; 
         const usdtRate = 0.0001; 
@@ -42,26 +45,14 @@
         const videoPool = [
             { url: "https://youtu.be/_hzf9W746hk?si=7EkyntxrRJyMRNUA" },
             { url: "https://youtu.be/p3AlcT7qGGM?si=ehkyBtHuyYblyS9s" },
-            { url: "https://youtu.be/CCDFnBjzbPM?si=SQP9MS-MCs7aofVG" },
-            { url: "https://youtu.be/unTAEBvggus?si=7vD8UkvwIdN7VO03" },
-            { url: "https://youtu.be/Hja_iwEkfmI?si=ZXUMVXyM17bBxfYU" },
-            { url: "https://youtu.be/I5mLBbsuAdA?si=VH2iyck33TTyj7I_" }
+            { url: "https://youtu.be/CCDFnBjzbPM?si=SQP9MS-MCs7aofVG" }
         ];
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
 
         let lastResetTime = localStorage.getItem('last_reset_time');
         let currentTime = new Date().getTime();
         
-        // 🔴 YAHAN CHANGE KIYA HAI: 24 ghante ki jagah 1 minute (60 * 1000 ms)
         if (!lastResetTime || (currentTime - lastResetTime > 60 * 1000)) {
-            shuffleArray(videoPool);
-            localStorage.setItem('todays_videos', JSON.stringify(videoPool.slice(0, 3)));
+            localStorage.setItem('todays_videos', JSON.stringify(videoPool));
             localStorage.setItem('last_reset_time', currentTime);
             localStorage.setItem('completed_tasks', JSON.stringify([]));
         }
@@ -111,7 +102,7 @@
                 tg.HapticFeedback.notificationOccurred('success');
 
                 if (userId) {
-                    tg.showAlert('⏳ Syncing balance in background...'); 
+                    tg.showAlert('⏳ Syncing balance to Database...'); 
                     
                     fetch('https://indexjs-production-3a24.up.railway.app/sync', {
                         method: 'POST',
@@ -120,15 +111,14 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        tg.showAlert('✅ Success! Bot me balance update ho gaya.');
+                        tg.showAlert('✅ Success! Balance permanently saved.');
                     })
                     .catch(err => {
-                        tg.showAlert('❌ Server Error: ' + err.message); 
+                        tg.showAlert('❌ Error linking to Railway: ' + err.message); 
                     });
                 } else {
-                    tg.showAlert('⚠️ Error: User ID nahi mili! (Kripya app ko Bot ke button se kholen)');
+                    tg.showAlert('⚠️ Error: User ID nahi mili. Kripya /start type karke naye button se app kholen.');
                 }
-
             }, 10000); 
         }
     </script>
