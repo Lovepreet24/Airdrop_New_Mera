@@ -28,7 +28,7 @@
         <p>💫 GALAXY</p>
     </div>
 
-    <h3 style="color: #c4b5fd; font-size: 16px; text-transform: uppercase;">📺 Daily Tasks (Refreshes in 24h)</h3>
+    <h3 style="color: #c4b5fd; font-size: 16px; text-transform: uppercase;">📺 Daily Tasks (Refreshes in 1 min for testing)</h3>
     <div class="task-container" id="task-container"></div>
 
     <script>
@@ -58,7 +58,8 @@
         let lastResetTime = localStorage.getItem('last_reset_time');
         let currentTime = new Date().getTime();
         
-        if (!lastResetTime || (currentTime - lastResetTime > 24 * 60 * 60 * 1000)) {
+        // 🔴 YAHAN CHANGE KIYA HAI: 24 ghante ki jagah 1 minute (60 * 1000 ms)
+        if (!lastResetTime || (currentTime - lastResetTime > 60 * 1000)) {
             shuffleArray(videoPool);
             localStorage.setItem('todays_videos', JSON.stringify(videoPool.slice(0, 3)));
             localStorage.setItem('last_reset_time', currentTime);
@@ -109,7 +110,6 @@
                 btn.innerText = 'DONE';
                 tg.HapticFeedback.notificationOccurred('success');
 
-                // 👇 CHEKER CODE YAHAN HAI 👇
                 if (userId) {
                     tg.showAlert('⏳ Syncing balance in background...'); 
                     
@@ -128,7 +128,6 @@
                 } else {
                     tg.showAlert('⚠️ Error: User ID nahi mili! (Kripya app ko Bot ke button se kholen)');
                 }
-                // 👆 CHEKER CODE KHATAM 👆
 
             }, 10000); 
         }
