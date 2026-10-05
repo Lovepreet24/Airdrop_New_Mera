@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
-  <title>USDT Galaxy</title>
+  <title>Galaxy Token</title>
 
   <!-- Telegram official Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
@@ -276,7 +276,7 @@
         </div>
 
         <div class="title">
-          USDT Galaxy
+          Galaxy Token
         </div>
 
         <p class="muted">
@@ -398,7 +398,7 @@
       <div>
 
         <div class="title">
-          USDT Galaxy
+          Galaxy Token
         </div>
 
         <div
@@ -508,7 +508,7 @@
         </div>
 
         <p class="muted">
-          Watch videos and complete tasks to earn GALAXY.
+          Watch YouTube videos and complete tasks to earn GALAXY.
         </p>
 
         <button
@@ -531,7 +531,7 @@
           id="minimumText"
           class="muted"
         >
-          Minimum withdrawal: 700 GALAXY ($0.07 USDT)
+          Minimum withdrawal: 500 GALAXY ($0.05 USDT)
         </p>
 
         <button
@@ -560,7 +560,7 @@
         </div>
 
         <p class="muted">
-          Each video task gives 100 GALAXY ($0.01 USDT).
+          Each video task gives 50 GALAXY ($0.005 USDT).
         </p>
 
         <div class="small-card">
@@ -578,7 +578,7 @@
         <p class="muted">
           Watch video and earn
           <span class="reward">
-            100 GALAXY ($0.01 USDT)
+            50 GALAXY ($0.005 USDT)
           </span>
         </p>
 
@@ -591,7 +591,7 @@
             this
           )"
         >
-          ▶️ Watch & Earn +100
+          ▶️ Watch & Earn +50
         </button>
 
         <div
@@ -609,7 +609,7 @@
         <p class="muted">
           Watch video and earn
           <span class="reward">
-            100 GALAXY ($0.01 USDT)
+            50 GALAXY ($0.005 USDT)
           </span>
         </p>
 
@@ -622,7 +622,7 @@
             this
           )"
         >
-          ▶️ Watch & Earn +100
+          ▶️ Watch & Earn +50
         </button>
 
         <div
@@ -640,7 +640,7 @@
         <p class="muted">
           Watch video and earn
           <span class="reward">
-            100 GALAXY ($0.01 USDT)
+            50 GALAXY ($0.005 USDT)
           </span>
         </p>
 
@@ -653,7 +653,7 @@
             this
           )"
         >
-          ▶️ Watch & Earn +100
+          ▶️ Watch & Earn +50
         </button>
 
         <div
@@ -797,14 +797,14 @@
           class="muted"
         >
           Minimum withdrawal:
-          700 GALAXY ($0.07 USDT)
+          500 GALAXY ($0.05 USDT)
         </p>
 
         <input
           id="payoutAmount"
           class="input"
           type="number"
-          min="700"
+          min="500"
           placeholder="GALAXY amount"
         >
 
@@ -919,7 +919,7 @@ let earned = 0;
 let referralCount = 0;
 let verified = false;
 let checking = false;
-let minimumWithdrawal = 700;
+let minimumWithdrawal = 500;
 let referralReward = 100;
 let taskData = {};
 let timerIntervals = {};
@@ -929,12 +929,6 @@ let timerIntervals = {};
    TELEGRAM SESSION
    ============================================================ */
 
-/*
-  Wait until Telegram WebApp is available AND initData exists.
-
-  This is important because on some devices Telegram may load
-  the Mini App first and populate initData slightly later.
-*/
 async function waitForTelegramSession(
   timeout = 10000
 ) {
@@ -965,10 +959,6 @@ async function waitForTelegramSession(
           webApp.expand();
         } catch (_) {}
 
-
-        /*
-          Real authenticated Mini App data.
-        */
         if (
           typeof webApp.initData ===
             "string" &&
@@ -988,10 +978,6 @@ async function waitForTelegramSession(
       );
     }
 
-
-    /*
-      Retry every 250ms.
-    */
     await new Promise(
       resolve =>
         setTimeout(
@@ -1001,12 +987,6 @@ async function waitForTelegramSession(
     );
   }
 
-
-  /*
-    Return WebApp object even if initData
-    is still missing, so caller can show
-    the correct error.
-  */
   if (
     window.Telegram &&
     window.Telegram.WebApp
@@ -1030,19 +1010,16 @@ async function initializeTelegram() {
       "gateStatus"
     );
 
-
   status.innerText =
     "⏳ Connecting to Telegram...";
 
   status.className =
     "status muted";
 
-
   const webApp =
     await waitForTelegramSession(
       10000
     );
-
 
   if (!webApp) {
 
@@ -1055,35 +1032,16 @@ async function initializeTelegram() {
     return false;
   }
 
-
   tg = webApp;
 
-
-  /*
-    Telegram recommends ready() once
-    the Mini App is ready to display.
-  */
   try {
     tg.ready();
   } catch (_) {}
 
-
-  /*
-    Expand the Mini App.
-  */
   try {
     tg.expand();
   } catch (_) {}
 
-
-  /*
-    IMPORTANT:
-    initDataUnsafe is only used for displaying
-    user information on the frontend.
-
-    It is NOT sent to the backend as authentication.
-    Backend always receives tg.initData.
-  */
   if (
     tg.initDataUnsafe &&
     tg.initDataUnsafe.user
@@ -1093,10 +1051,6 @@ async function initializeTelegram() {
       tg.initDataUnsafe.user;
   }
 
-
-  /*
-    Check authenticated raw initData.
-  */
   if (
     !tg.initData ||
     typeof tg.initData !== "string" ||
@@ -1115,7 +1069,6 @@ async function initializeTelegram() {
       }
     );
 
-
     status.innerText =
       "❌ Telegram session missing. Close this app and open it again using the bot's Launch App button.";
 
@@ -1125,12 +1078,7 @@ async function initializeTelegram() {
     return false;
   }
 
-
-  /*
-    Session successfully received.
-  */
   updateUser();
-
 
   console.log(
     "Telegram Mini App initialized successfully.",
@@ -1146,7 +1094,6 @@ async function initializeTelegram() {
     }
   );
 
-
   return true;
 }
 
@@ -1159,35 +1106,29 @@ function updateUser() {
 
   if (!user) return;
 
-
   const firstName =
     user.first_name ||
     "Galaxy User";
-
 
   const username =
     user.username
       ? "@" + user.username
       : "Telegram User";
 
-
   document.getElementById(
     "welcome"
   ).innerText =
     "Welcome, " + firstName;
-
 
   document.getElementById(
     "profileName"
   ).innerText =
     firstName;
 
-
   document.getElementById(
     "profileUsername"
   ).innerText =
     username;
-
 
   const initials =
     firstName
@@ -1202,12 +1143,10 @@ function updateUser() {
       )
       .toUpperCase();
 
-
   document.getElementById(
     "avatar"
   ).innerText =
     initials;
-
 
   document.getElementById(
     "referralLink"
@@ -1244,9 +1183,7 @@ async function api(
       }
     );
 
-
   let result = {};
-
 
   try {
 
@@ -1258,7 +1195,6 @@ async function api(
     result = {};
   }
 
-
   if (!response.ok) {
 
     const error =
@@ -1268,14 +1204,11 @@ async function api(
         "Request failed"
       );
 
-
     error.data =
       result;
 
-
     throw error;
   }
-
 
   return result;
 }
@@ -1289,11 +1222,6 @@ async function checkChannels() {
 
   if (checking) return;
 
-
-  /*
-    If Telegram object is not ready,
-    initialize it again.
-  */
   if (
     !tg ||
     !tg.initData
@@ -1301,7 +1229,6 @@ async function checkChannels() {
 
     const connected =
       await initializeTelegram();
-
 
     if (
       !connected ||
@@ -1323,35 +1250,28 @@ async function checkChannels() {
     }
   }
 
-
   checking = true;
-
 
   const button =
     document.getElementById(
       "checkBtn"
     );
 
-
   button.disabled =
     true;
 
-
   button.innerText =
     "⏳ Checking...";
-
 
   document.getElementById(
     "gateStatus"
   ).innerText =
     "Checking channel membership...";
 
-
   document.getElementById(
     "gateStatus"
   ).className =
     "status muted";
-
 
   try {
 
@@ -1364,29 +1284,22 @@ async function checkChannels() {
         }
       );
 
-
     console.log(
       "VERIFY RESPONSE:",
       result
     );
 
-
     const mainJoined =
       result &&
       result.mainJoined === true;
-
 
     const paymentJoined =
       result &&
       result.paymentJoined === true;
 
-
     const allJoined =
       mainJoined &&
       paymentJoined;
-
-
-    /* MAIN CHANNEL */
 
     if (mainJoined) {
 
@@ -1395,7 +1308,6 @@ async function checkChannels() {
       ).innerText =
         "✓ Joined";
 
-
       document.getElementById(
         "mainStatus"
       ).className =
@@ -1408,15 +1320,11 @@ async function checkChannels() {
       ).innerText =
         "Not joined";
 
-
       document.getElementById(
         "mainStatus"
       ).className =
         "muted";
     }
-
-
-    /* PAYMENT CHANNEL */
 
     if (paymentJoined) {
 
@@ -1425,7 +1333,6 @@ async function checkChannels() {
       ).innerText =
         "✓ Joined";
 
-
       document.getElementById(
         "paymentStatus"
       ).className =
@@ -1438,32 +1345,25 @@ async function checkChannels() {
       ).innerText =
         "Not joined";
 
-
       document.getElementById(
         "paymentStatus"
       ).className =
         "muted";
     }
 
-
-    /* BOTH JOINED */
-
     if (allJoined) {
 
       verified = true;
-
 
       document.getElementById(
         "gateStatus"
       ).innerText =
         "✅ Both channels verified successfully.";
 
-
       document.getElementById(
         "gateStatus"
       ).className =
         "status green";
-
 
       document.getElementById(
         "continueBtn"
@@ -1471,12 +1371,10 @@ async function checkChannels() {
         "hidden"
       );
 
-
       document.getElementById(
         "verifyDot"
       ).innerText =
         "● Verified";
-
 
       if (
         tg.HapticFeedback
@@ -1492,19 +1390,16 @@ async function checkChannels() {
 
       verified = false;
 
-
       document.getElementById(
         "gateStatus"
       ).innerText =
         "❌ Please join both channels and check again.";
-
 
       document.getElementById(
         "gateStatus"
       ).className =
         "status red";
     }
-
 
   } catch (error) {
 
@@ -1513,12 +1408,10 @@ async function checkChannels() {
       error
     );
 
-
     document.getElementById(
       "gateStatus"
     ).innerText =
       "❌ Verification failed. Please try again.";
-
 
     document.getElementById(
       "gateStatus"
@@ -1526,14 +1419,11 @@ async function checkChannels() {
       "status red";
   }
 
-
   button.disabled =
     false;
 
-
   button.innerText =
     "🔍 Check Membership";
-
 
   checking =
     false;
@@ -1581,12 +1471,10 @@ async function unlockApp() {
     return;
   }
 
-
   document.getElementById(
     "gate"
   ).style.display =
     "none";
-
 
   document.getElementById(
     "app"
@@ -1594,18 +1482,15 @@ async function unlockApp() {
     "hidden"
   );
 
-
   document.getElementById(
     "bottomNav"
   ).classList.remove(
     "hidden"
   );
 
-
   showPage(
     "home"
   );
-
 
   await syncUser();
 }
@@ -1624,7 +1509,6 @@ async function syncUser() {
     return;
   }
 
-
   try {
 
     const result =
@@ -1636,27 +1520,22 @@ async function syncUser() {
         }
       );
 
-
     console.log(
       "SYNC RESPONSE:",
       result
     );
 
-
     if (!result) return;
-
 
     const backendUser =
       result.user ||
       {};
-
 
     updateBalance(
       backendUser.balance ||
       result.balance ||
       0
     );
-
 
     referralCount =
       Number(
@@ -1665,18 +1544,15 @@ async function syncUser() {
         0
       );
 
-
     document.getElementById(
       "referrals"
     ).innerText =
       referralCount.toLocaleString();
 
-
     document.getElementById(
       "referralBig"
     ).innerText =
       referralCount.toLocaleString();
-
 
     referralReward =
       Number(
@@ -1684,20 +1560,17 @@ async function syncUser() {
         100
       );
 
-
     minimumWithdrawal =
       Number(
         result.minWithdrawal ||
-        700
+        500
       );
-
 
     const minUsdt =
       (
         minimumWithdrawal *
         0.0001
       ).toFixed(2);
-
 
     document.getElementById(
       "minimumText"
@@ -1708,7 +1581,6 @@ async function syncUser() {
       minUsdt +
       " USDT)";
 
-
     document.getElementById(
       "payoutInfo"
     ).innerText =
@@ -1718,12 +1590,10 @@ async function syncUser() {
       minUsdt +
       " USDT)";
 
-
     document.getElementById(
       "payoutAmount"
     ).min =
       minimumWithdrawal;
-
 
     document.getElementById(
       "payoutAmount"
@@ -1731,7 +1601,6 @@ async function syncUser() {
       "Minimum " +
       minimumWithdrawal +
       " GALAXY";
-
 
   } catch (error) {
 
@@ -1756,12 +1625,10 @@ function updateBalance(
       value || 0
     );
 
-
   document.getElementById(
     "balance"
   ).innerText =
     balance.toLocaleString();
-
 
   document.getElementById(
     "usdt"
@@ -1790,7 +1657,6 @@ function showPage(
     "profile"
   ];
 
-
   pages.forEach(
     name => {
 
@@ -1798,7 +1664,6 @@ function showPage(
         document.getElementById(
           name
         );
-
 
       if (element) {
 
@@ -1810,14 +1675,12 @@ function showPage(
     }
   );
 
-
   const navs = [
     "Home",
     "Earn",
     "Referral",
     "Profile"
   ];
-
 
   navs.forEach(
     name => {
@@ -1826,7 +1689,6 @@ function showPage(
         document.getElementById(
           "nav" + name
         );
-
 
       if (element) {
 
@@ -1839,14 +1701,12 @@ function showPage(
     }
   );
 
-
   if (
     page === "profile"
   ) {
 
     loadPayoutHistory();
   }
-
 
   window.scrollTo(
     0,
@@ -1874,7 +1734,6 @@ async function watchTask(
     return;
   }
 
-
   if (
     !tg ||
     !tg.initData
@@ -1887,14 +1746,11 @@ async function watchTask(
     return;
   }
 
-
   button.disabled =
     true;
 
-
   button.innerText =
     "⏳ Opening...";
-
 
   try {
 
@@ -1915,7 +1771,6 @@ async function watchTask(
       );
     }
 
-
     await new Promise(
       resolve =>
         setTimeout(
@@ -1924,10 +1779,8 @@ async function watchTask(
         )
     );
 
-
     button.innerText =
       "⏳ Claiming...";
-
 
     const result =
       await api(
@@ -1941,24 +1794,20 @@ async function watchTask(
         }
       );
 
-
     if (result.ok) {
 
       const reward =
         Number(
           result.reward ||
-          100
+          50
         );
-
 
       updateBalance(
         result.balance
       );
 
-
       button.innerText =
         "⏳ Cooldown";
-
 
       alert(
         "🎉 +" +
@@ -1967,13 +1816,11 @@ async function watchTask(
         (
           reward *
           0.0001
-        ).toFixed(2) +
+        ).toFixed(3) +
         " USDT) added!"
       );
 
-
       await syncUser();
-
 
     } else {
 
@@ -1982,7 +1829,6 @@ async function watchTask(
       );
     }
 
-
   } catch (error) {
 
     console.error(
@@ -1990,14 +1836,11 @@ async function watchTask(
       error
     );
 
-
     button.disabled =
       false;
 
-
     button.innerText =
-      "▶️ Watch & Earn +100";
-
+      "▶️ Watch & Earn +50";
 
     alert(
       error.message ||
@@ -2018,28 +1861,23 @@ async function copyReferral() {
       "referralLink"
     );
 
-
   try {
 
     await navigator.clipboard.writeText(
       input.value
     );
 
-
     alert(
       "✅ Referral link copied!"
     );
-
 
   } catch (_) {
 
     input.select();
 
-
     document.execCommand(
       "copy"
     );
-
 
     alert(
       "✅ Referral link copied!"
@@ -2055,10 +1893,8 @@ function shareReferral() {
       "referralLink"
     ).value;
 
-
   const text =
-    "🚀 Join USDT Galaxy and start earning GALAXY!";
-
+    "🚀 Join Galaxy Token and start earning GALAXY!";
 
   const share =
     "https://t.me/share/url?url=" +
@@ -2069,7 +1905,6 @@ function shareReferral() {
     encodeURIComponent(
       text
     );
-
 
   openTelegram(
     share
@@ -2095,7 +1930,6 @@ async function requestPayout() {
     return;
   }
 
-
   const amount =
     Number(
       document.getElementById(
@@ -2103,24 +1937,20 @@ async function requestPayout() {
       ).value
     );
 
-
   const wallet =
     document.getElementById(
       "wallet"
     ).value.trim();
-
 
   const status =
     document.getElementById(
       "payoutStatus"
     );
 
-
   const button =
     document.getElementById(
       "payoutBtn"
     );
-
 
   if (
     !Number.isInteger(
@@ -2141,10 +1971,8 @@ async function requestPayout() {
       " USDT)."
     );
 
-
     return;
   }
-
 
   if (
     amount >
@@ -2155,10 +1983,8 @@ async function requestPayout() {
       "Insufficient balance."
     );
 
-
     return;
   }
-
 
   if (!wallet) {
 
@@ -2166,22 +1992,17 @@ async function requestPayout() {
       "Please enter your BSC USDT wallet address."
     );
 
-
     return;
   }
-
 
   button.disabled =
     true;
 
-
   button.innerText =
     "⏳ Processing...";
 
-
   status.innerText =
     "Sending USDT payout...";
-
 
   try {
 
@@ -2200,7 +2021,6 @@ async function requestPayout() {
         }
       );
 
-
     if (
       result.ok
     ) {
@@ -2212,16 +2032,13 @@ async function requestPayout() {
         )
       );
 
-
       document.getElementById(
         "payoutAmount"
       ).value = "";
 
-
       document.getElementById(
         "wallet"
       ).value = "";
-
 
       if (
         result.status ===
@@ -2231,10 +2048,8 @@ async function requestPayout() {
         status.innerText =
           "✅ Paid automatically!";
 
-
         status.className =
           "status green";
-
 
         alert(
           "✅ USDT payout successful!\n\n" +
@@ -2249,16 +2064,13 @@ async function requestPayout() {
           result.txHash
         );
 
-
       } else {
 
         status.innerText =
           "⏳ Withdrawal submitted.";
 
-
         status.className =
           "status yellow";
-
 
         alert(
           "⏳ Withdrawal submitted.\n\n" +
@@ -2271,9 +2083,7 @@ async function requestPayout() {
         );
       }
 
-
       await loadPayoutHistory();
-
 
     } else {
 
@@ -2283,14 +2093,12 @@ async function requestPayout() {
       );
     }
 
-
   } catch (error) {
 
     console.error(
       "PAYOUT ERROR:",
       error
     );
-
 
     status.innerText =
       "❌ " +
@@ -2299,10 +2107,8 @@ async function requestPayout() {
         "Payout failed."
       );
 
-
     status.className =
       "status red";
-
 
     alert(
       "❌ " +
@@ -2313,10 +2119,8 @@ async function requestPayout() {
     );
   }
 
-
   button.disabled =
     false;
-
 
   button.innerText =
     "💰 Request Payout";
@@ -2336,12 +2140,10 @@ async function loadPayoutHistory() {
     return;
   }
 
-
   const container =
     document.getElementById(
       "payoutHistory"
     );
-
 
   try {
 
@@ -2354,7 +2156,6 @@ async function loadPayoutHistory() {
         }
       );
 
-
     if (
       !result ||
       !Array.isArray(
@@ -2366,13 +2167,10 @@ async function loadPayoutHistory() {
       container.innerText =
         "No payout history.";
 
-
       return;
     }
 
-
     container.innerHTML = "";
-
 
     result.payouts.forEach(
       payout => {
@@ -2382,19 +2180,15 @@ async function loadPayoutHistory() {
             "div"
           );
 
-
         div.className =
           "small-card";
-
 
         const status =
           payout.status ||
           "pending";
 
-
         let statusClass =
           "yellow";
-
 
         if (
           status === "paid"
@@ -2403,7 +2197,6 @@ async function loadPayoutHistory() {
           statusClass =
             "green";
         }
-
 
         if (
           status === "failed" ||
@@ -2414,13 +2207,11 @@ async function loadPayoutHistory() {
             "red";
         }
 
-
         const usdt =
           Number(
             payout.amount || 0
           ) *
           0.0001;
-
 
         div.innerHTML =
           "<b>" +
@@ -2448,7 +2239,6 @@ async function loadPayoutHistory() {
           ) +
           "</span>";
 
-
         if (
           payout.tx_hash
         ) {
@@ -2466,13 +2256,11 @@ async function loadPayoutHistory() {
             "</span>";
         }
 
-
         container.appendChild(
           div
         );
       }
     );
-
 
   } catch (error) {
 
@@ -2480,7 +2268,6 @@ async function loadPayoutHistory() {
       "PAYOUT HISTORY ERROR:",
       error
     );
-
 
     container.innerText =
       "Unable to load payout history.";
@@ -2492,14 +2279,9 @@ async function loadPayoutHistory() {
    TELEGRAM APP ACTIVATED / FOREGROUND
    ============================================================ */
 
-/*
-  If Telegram minimizes/reopens the Mini App,
-  check the session again.
-*/
 function setupTelegramEvents() {
 
   if (!tg) return;
-
 
   try {
 
@@ -2516,15 +2298,10 @@ function setupTelegramEvents() {
             "Telegram Mini App activated"
           );
 
-
-          /*
-            Re-read Telegram object.
-          */
           const webApp =
             await waitForTelegramSession(
               3000
             );
-
 
           if (
             webApp &&
@@ -2533,7 +2310,6 @@ function setupTelegramEvents() {
 
             tg =
               webApp;
-
 
             if (
               !user &&
@@ -2544,7 +2320,6 @@ function setupTelegramEvents() {
               user =
                 tg.initDataUnsafe.user;
             }
-
 
             updateUser();
           }
@@ -2571,33 +2346,18 @@ async function init() {
   const connected =
     await initializeTelegram();
 
-
   if (!connected) {
 
     return;
   }
 
-
   setupTelegramEvents();
 
-
-  /*
-    User UI is now safe to update because
-    Telegram session exists.
-  */
   updateUser();
 
-
-  /*
-    Verify both channels automatically.
-  */
   await checkChannels();
 }
 
-
-/*
-  Start after page DOM is ready.
-*/
 if (
   document.readyState ===
   "loading"
@@ -2634,7 +2394,6 @@ document.addEventListener(
 
         const connected =
           await initializeTelegram();
-
 
         if (connected) {
 
