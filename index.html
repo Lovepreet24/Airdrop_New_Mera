@@ -85,6 +85,10 @@
       color: #f87171;
     }
 
+    .yellow {
+      color: #facc15;
+    }
+
     .btn {
       width: 100%;
       padding: 14px;
@@ -98,6 +102,7 @@
 
     .btn:disabled {
       opacity: .5;
+      cursor: not-allowed;
     }
 
     .secondary {
@@ -133,14 +138,6 @@
       font-weight: bold;
     }
 
-    .check {
-      background: #2563eb;
-      color: white;
-      padding: 10px 13px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-
     .join {
       background: #334155;
       color: white;
@@ -149,10 +146,6 @@
       font-weight: bold;
       margin-top: 8px;
       width: 100%;
-    }
-
-    .check-area {
-      margin-top: 15px;
     }
 
     .input {
@@ -243,9 +236,27 @@
       margin-top: 14px;
       font-size: 13px;
     }
+
+    .task-time {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #facc15;
+      text-align: center;
+    }
+
+    .reward {
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .small-card {
+      background: #0b1220;
+      border-radius: 13px;
+      padding: 13px;
+      margin-top: 10px;
+    }
   </style>
 </head>
-
 
 <body>
 
@@ -272,7 +283,6 @@
         </p>
 
       </div>
-
 
       <!-- MAIN CHANNEL -->
 
@@ -306,7 +316,6 @@
         📢 Join Main Channel
       </button>
 
-
       <!-- PAYMENT CHANNEL -->
 
       <div class="channel">
@@ -339,9 +348,6 @@
         💳 Join Payment Channel
       </button>
 
-
-      <!-- CHECK -->
-
       <button
         id="checkBtn"
         class="btn"
@@ -350,14 +356,12 @@
         🔍 Check Membership
       </button>
 
-
       <div
         id="gateStatus"
         class="status muted"
       >
         Join both channels and press Check.
       </div>
-
 
       <button
         id="continueBtn"
@@ -460,6 +464,14 @@
             0
           </div>
 
+          <div
+            id="earnedUsdt"
+            class="muted"
+            style="margin-top:4px;"
+          >
+            $0.00 USDT
+          </div>
+
         </div>
 
 
@@ -474,6 +486,13 @@
             class="stat-number"
           >
             0
+          </div>
+
+          <div
+            class="muted"
+            style="margin-top:4px;"
+          >
+            +100 GALAXY each
           </div>
 
         </div>
@@ -500,6 +519,29 @@
 
       </div>
 
+
+      <div class="card">
+
+        <div style="font-size:18px;font-weight:bold;">
+          💸 Withdrawal
+        </div>
+
+        <p
+          id="minimumText"
+          class="muted"
+        >
+          Minimum withdrawal: 700 GALAXY ($0.07 USDT)
+        </p>
+
+        <button
+          class="btn secondary"
+          onclick="showPage('profile')"
+        >
+          💳 Withdraw
+        </button>
+
+      </div>
+
     </div>
 
 
@@ -517,18 +559,28 @@
         </div>
 
         <p class="muted">
-          Complete the videos to claim rewards.
+          Each video task gives 100 GALAXY ($0.01 USDT).
         </p>
+
+        <div class="small-card">
+          ⏱️ Each task becomes available again after
+          <b>24 hours</b>.
+        </div>
 
       </div>
 
+
+      <!-- VIDEO 1 -->
 
       <div class="card">
 
         <b>🎥 Video Task 1</b>
 
         <p class="muted">
-          Watch video and earn 100 GALAXY.
+          Watch video and earn
+          <span class="reward">
+            100 GALAXY ($0.01 USDT)
+          </span>
         </p>
 
         <button
@@ -543,15 +595,25 @@
           ▶️ Watch & Earn +100
         </button>
 
+        <div
+          id="timer1"
+          class="task-time hidden"
+        ></div>
+
       </div>
 
+
+      <!-- VIDEO 2 -->
 
       <div class="card">
 
         <b>🎥 Video Task 2</b>
 
         <p class="muted">
-          Watch video and earn 100 GALAXY.
+          Watch video and earn
+          <span class="reward">
+            100 GALAXY ($0.01 USDT)
+          </span>
         </p>
 
         <button
@@ -566,15 +628,25 @@
           ▶️ Watch & Earn +100
         </button>
 
+        <div
+          id="timer2"
+          class="task-time hidden"
+        ></div>
+
       </div>
 
+
+      <!-- VIDEO 3 -->
 
       <div class="card">
 
         <b>🎥 Video Task 3</b>
 
         <p class="muted">
-          Watch video and earn 100 GALAXY.
+          Watch video and earn
+          <span class="reward">
+            100 GALAXY ($0.01 USDT)
+          </span>
         </p>
 
         <button
@@ -588,6 +660,11 @@
         >
           ▶️ Watch & Earn +100
         </button>
+
+        <div
+          id="timer3"
+          class="task-time hidden"
+        ></div>
 
       </div>
 
@@ -608,7 +685,11 @@
         </div>
 
         <p class="muted">
-          Share your referral link with friends.
+          Earn
+          <span class="reward">
+            100 GALAXY ($0.01 USDT)
+          </span>
+          for every valid referral.
         </p>
 
 
@@ -721,8 +802,12 @@
           💳 Manual Payout
         </div>
 
-        <p class="muted">
-          Submit your withdrawal request for manual processing.
+        <p
+          id="payoutInfo"
+          class="muted"
+        >
+          Minimum withdrawal:
+          700 GALAXY ($0.07 USDT)
         </p>
 
 
@@ -730,6 +815,7 @@
           id="payoutAmount"
           class="input"
           type="number"
+          min="700"
           placeholder="GALAXY amount"
         >
 
@@ -742,35 +828,36 @@
 
 
         <button
+          id="payoutBtn"
           class="btn"
           onclick="requestPayout()"
         >
           💰 Request Payout
         </button>
 
+        <div
+          id="payoutStatus"
+          class="status muted"
+        ></div>
+
       </div>
 
 
-      <!-- REDEEM -->
+      <!-- PAYOUT HISTORY -->
 
       <div class="card">
 
         <div style="font-size:19px;font-weight:bold;">
-          🎁 Redeem Code
+          📋 Payout History
         </div>
 
-        <input
-          id="redeem"
-          class="input"
-          placeholder="Enter redeem code"
+        <div
+          id="payoutHistory"
+          class="muted"
+          style="margin-top:10px;"
         >
-
-        <button
-          class="btn"
-          onclick="redeemCode()"
-        >
-          🎁 Redeem
-        </button>
+          No payout history.
+        </div>
 
       </div>
 
@@ -845,23 +932,25 @@ const tg =
     : null;
 
 
-let user =
-  null;
+let user = null;
 
-let balance =
-  0;
+let balance = 0;
 
-let earned =
-  0;
+let earned = 0;
 
-let referralCount =
-  0;
+let referralCount = 0;
 
-let verified =
-  false;
+let verified = false;
 
-let checking =
-  false;
+let checking = false;
+
+let minimumWithdrawal = 700;
+
+let referralReward = 100;
+
+let taskData = {};
+
+let timerIntervals = {};
 
 
 /* ================= TELEGRAM INIT ================= */
@@ -986,11 +1075,17 @@ async function api(
 
   if (!response.ok) {
 
-    throw new Error(
-      result.error ||
-      result.message ||
-      "Request failed"
-    );
+    const error =
+      new Error(
+        result.error ||
+        result.message ||
+        "Request failed"
+      );
+
+    error.data =
+      result;
+
+    throw error;
 
   }
 
@@ -1024,8 +1119,7 @@ async function checkChannels() {
   }
 
 
-  checking =
-    true;
+  checking = true;
 
 
   const button =
@@ -1034,9 +1128,7 @@ async function checkChannels() {
     );
 
 
-  button.disabled =
-    true;
-
+  button.disabled = true;
 
   button.innerText =
     "⏳ Checking...";
@@ -1058,12 +1150,6 @@ async function checkChannels() {
             tg.initData
         }
       );
-
-
-    console.log(
-      "VERIFY RESULT:",
-      result
-    );
 
 
     const mainJoined =
@@ -1092,7 +1178,6 @@ async function checkChannels() {
       ).innerText =
         "✓ Joined";
 
-
       document.getElementById(
         "mainStatus"
       ).className =
@@ -1119,7 +1204,6 @@ async function checkChannels() {
       ).innerText =
         "✓ Joined";
 
-
       document.getElementById(
         "paymentStatus"
       ).className =
@@ -1141,8 +1225,7 @@ async function checkChannels() {
 
     if (allJoined) {
 
-      verified =
-        true;
+      verified = true;
 
 
       document.getElementById(
@@ -1177,8 +1260,7 @@ async function checkChannels() {
 
     } else {
 
-      verified =
-        false;
+      verified = false;
 
 
       document.getElementById(
@@ -1216,16 +1298,12 @@ async function checkChannels() {
   }
 
 
-  button.disabled =
-    false;
-
+  button.disabled = false;
 
   button.innerText =
     "🔍 Check Membership";
 
-
-  checking =
-    false;
+  checking = false;
 
 }
 
@@ -1327,11 +1405,119 @@ async function syncUser() {
       );
 
 
-    if (result) {
+    if (!result) {
+      return;
+    }
 
-      updateBalance(
-        result.balance
+
+    /* BALANCE */
+
+    updateBalance(
+      result.balance
+    );
+
+
+    /* REFERRALS */
+
+    referralCount =
+      Number(
+        result.referrals || 0
       );
+
+
+    document.getElementById(
+      "referrals"
+    ).innerText =
+      referralCount.toLocaleString();
+
+
+    document.getElementById(
+      "referralBig"
+    ).innerText =
+      referralCount.toLocaleString();
+
+
+    /* REWARDS */
+
+    referralReward =
+      Number(
+        result.referralReward ||
+        100
+      );
+
+
+    minimumWithdrawal =
+      Number(
+        result.minWithdrawal ||
+        700
+      );
+
+
+    /* MINIMUM WITHDRAWAL UI */
+
+    const minUsdt =
+      (
+        minimumWithdrawal *
+        0.0001
+      ).toFixed(2);
+
+
+    document.getElementById(
+      "minimumText"
+    ).innerText =
+      "Minimum withdrawal: " +
+      minimumWithdrawal.toLocaleString() +
+      " GALAXY ($" +
+      minUsdt +
+      " USDT)";
+
+
+    document.getElementById(
+      "payoutInfo"
+    ).innerText =
+      "Minimum withdrawal: " +
+      minimumWithdrawal.toLocaleString() +
+      " GALAXY ($" +
+      minUsdt +
+      " USDT)";
+
+
+    document.getElementById(
+      "payoutAmount"
+    ).min =
+      minimumWithdrawal;
+
+
+    document.getElementById(
+      "payoutAmount"
+    ).placeholder =
+      "Minimum " +
+      minimumWithdrawal +
+      " GALAXY";
+
+
+    /* YOUTUBE TASKS */
+
+    if (
+      Array.isArray(
+        result.tasks
+      )
+    ) {
+
+      taskData = {};
+
+      result.tasks.forEach(
+        task => {
+
+          taskData[
+            task.id
+          ] = task;
+
+        }
+      );
+
+
+      updateTaskButtons();
 
     }
 
@@ -1444,10 +1630,250 @@ function showPage(
   );
 
 
+  if (
+    page === "profile"
+  ) {
+
+    loadPayoutHistory();
+
+  }
+
+
   window.scrollTo(
     0,
     0
   );
+
+}
+
+
+/* ================= TASK BUTTONS ================= */
+
+function updateTaskButtons() {
+
+  const ids = [
+    "video1",
+    "video2",
+    "video3"
+  ];
+
+
+  ids.forEach(
+    taskId => {
+
+      const task =
+        taskData[
+          taskId
+        ];
+
+
+      const number =
+        taskId.replace(
+          "video",
+          ""
+        );
+
+
+      const button =
+        document.getElementById(
+          "task" + number
+        );
+
+
+      const timer =
+        document.getElementById(
+          "timer" + number
+        );
+
+
+      if (
+        !button ||
+        !timer ||
+        !task
+      ) {
+        return;
+      }
+
+
+      if (
+        task.available === true
+      ) {
+
+        button.disabled =
+          false;
+
+        button.innerText =
+          "▶️ Watch & Earn +100";
+
+        timer.classList.add(
+          "hidden"
+        );
+
+        if (
+          timerIntervals[
+            taskId
+          ]
+        ) {
+
+          clearInterval(
+            timerIntervals[
+              taskId
+            ]
+          );
+
+          delete timerIntervals[
+            taskId
+          ];
+
+        }
+
+      } else {
+
+        button.disabled =
+          true;
+
+        button.innerText =
+          "⏳ Available again in 24h";
+
+        timer.classList.remove(
+          "hidden"
+        );
+
+
+        startTaskCountdown(
+          taskId,
+          task.nextAvailableAt
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ================= TASK COUNTDOWN ================= */
+
+function startTaskCountdown(
+  taskId,
+  nextAvailableAt
+) {
+
+  const number =
+    taskId.replace(
+      "video",
+      ""
+    );
+
+
+  const timer =
+    document.getElementById(
+      "timer" + number
+    );
+
+
+  if (!timer) {
+    return;
+  }
+
+
+  if (
+    timerIntervals[
+      taskId
+    ]
+  ) {
+
+    clearInterval(
+      timerIntervals[
+        taskId
+      ]
+    );
+
+  }
+
+
+  function tick() {
+
+    const remaining =
+      new Date(
+        nextAvailableAt
+      ).getTime() -
+      Date.now();
+
+
+    if (
+      remaining <= 0
+    ) {
+
+      clearInterval(
+        timerIntervals[
+          taskId
+        ]
+      );
+
+
+      timer.innerText =
+        "✅ Task available again!";
+
+
+      timer.classList.remove(
+        "hidden"
+      );
+
+
+      syncUser();
+
+      return;
+
+    }
+
+
+    const totalSeconds =
+      Math.ceil(
+        remaining / 1000
+      );
+
+
+    const hours =
+      Math.floor(
+        totalSeconds / 3600
+      );
+
+
+    const minutes =
+      Math.floor(
+        (
+          totalSeconds % 3600
+        ) / 60
+      );
+
+
+    const seconds =
+      totalSeconds % 60;
+
+
+    timer.innerText =
+      "⏳ Available in " +
+      String(hours).padStart(2, "0") +
+      ":" +
+      String(minutes).padStart(2, "0") +
+      ":" +
+      String(seconds).padStart(2, "0");
+
+  }
+
+
+  tick();
+
+
+  timerIntervals[
+    taskId
+  ] =
+    setInterval(
+      tick,
+      1000
+    );
 
 }
 
@@ -1471,9 +1897,28 @@ async function watchTask(
   }
 
 
+  const task =
+    taskData[
+      taskId
+    ];
+
+
+  if (
+    task &&
+    task.available === false
+  ) {
+
+    alert(
+      "This task is still on cooldown."
+    );
+
+    return;
+
+  }
+
+
   button.disabled =
     true;
-
 
   button.innerText =
     "⏳ Opening...";
@@ -1537,11 +1982,15 @@ async function watchTask(
       );
 
 
-      earned +=
+      const reward =
         Number(
           result.earned ||
           100
         );
+
+
+      earned +=
+        reward;
 
 
       document.getElementById(
@@ -1550,12 +1999,33 @@ async function watchTask(
         earned.toLocaleString();
 
 
+      document.getElementById(
+        "earnedUsdt"
+      ).innerText =
+        "$" +
+        (
+          earned *
+          0.0001
+        ).toFixed(2) +
+        " USDT";
+
+
       button.innerText =
-        "✅ Earned";
+        "⏳ Cooldown";
+
+
+      await syncUser();
 
 
       alert(
-        "🎉 Reward added!"
+        "🎉 +" +
+        reward +
+        " GALAXY ($" +
+        (
+          reward *
+          0.0001
+        ).toFixed(2) +
+        " USDT) added!"
       );
 
     } else {
@@ -1574,9 +2044,27 @@ async function watchTask(
     );
 
 
+    /* Cooldown response */
+
+    if (
+      error.data &&
+      error.data.error ===
+        "TASK_COOLDOWN"
+    ) {
+
+      await syncUser();
+
+      alert(
+        "⏳ This task is on 24-hour cooldown."
+      );
+
+      return;
+
+    }
+
+
     button.disabled =
       false;
-
 
     button.innerText =
       "▶️ Watch & Earn +100";
@@ -1661,7 +2149,7 @@ function shareReferral() {
 
 /* ================= PAYOUT ================= */
 
-function requestPayout() {
+async function requestPayout() {
 
   const amount =
     Number(
@@ -1677,24 +2165,35 @@ function requestPayout() {
     ).value.trim();
 
 
+  const status =
+    document.getElementById(
+      "payoutStatus"
+    );
+
+
+  const button =
+    document.getElementById(
+      "payoutBtn"
+    );
+
+
   if (
-    !amount ||
-    amount < 1000
+    !Number.isInteger(
+      amount
+    ) ||
+    amount <
+      minimumWithdrawal
   ) {
 
     alert(
-      "Minimum payout is 1000 GALAXY."
-    );
-
-    return;
-
-  }
-
-
-  if (!wallet) {
-
-    alert(
-      "Please enter your USDT wallet address."
+      "Minimum withdrawal is " +
+      minimumWithdrawal +
+      " GALAXY ($" +
+      (
+        minimumWithdrawal *
+        0.0001
+      ).toFixed(2) +
+      " USDT)."
     );
 
     return;
@@ -1716,27 +2215,10 @@ function requestPayout() {
   }
 
 
-  alert(
-    "Payout request system is being connected to the backend."
-  );
-
-}
-
-
-/* ================= REDEEM ================= */
-
-function redeemCode() {
-
-  const code =
-    document.getElementById(
-      "redeem"
-    ).value.trim();
-
-
-  if (!code) {
+  if (!wallet) {
 
     alert(
-      "Please enter a redeem code."
+      "Please enter your USDT wallet address."
     );
 
     return;
@@ -1744,9 +2226,285 @@ function redeemCode() {
   }
 
 
-  alert(
-    "Redeem system is coming soon."
-  );
+  button.disabled =
+    true;
+
+  button.innerText =
+    "⏳ Submitting...";
+
+
+  status.innerText =
+    "Submitting withdrawal request...";
+
+
+  try {
+
+    const result =
+      await api(
+        "/payout",
+        {
+          initData:
+            tg.initData,
+
+          amount:
+            amount,
+
+          wallet:
+            wallet
+        }
+      );
+
+
+    if (
+      result &&
+      result.success
+    ) {
+
+      updateBalance(
+        result.balance
+      );
+
+
+      document.getElementById(
+        "payoutAmount"
+      ).value =
+        "";
+
+
+      document.getElementById(
+        "wallet"
+      ).value =
+        "";
+
+
+      status.innerText =
+        "✅ Payout request submitted. Status: Pending";
+
+      status.className =
+        "status green";
+
+
+      alert(
+        "✅ Payout request submitted!\n\n" +
+        amount +
+        " GALAXY ($" +
+        (
+          amount *
+          0.0001
+        ).toFixed(2) +
+        " USDT)\n\n" +
+        "Your request will be processed manually."
+      );
+
+
+      await loadPayoutHistory();
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "PAYOUT ERROR:",
+      error
+    );
+
+
+    let message =
+      error.message ||
+      "Payout failed.";
+
+
+    if (
+      error.data &&
+      error.data.error ===
+        "INSUFFICIENT_BALANCE"
+    ) {
+
+      message =
+        "Insufficient balance.";
+
+    }
+
+
+    if (
+      error.data &&
+      error.data.error ===
+        "MIN_WITHDRAWAL"
+    ) {
+
+      message =
+        "Minimum withdrawal is " +
+        minimumWithdrawal +
+        " GALAXY.";
+
+    }
+
+
+    status.innerText =
+      "❌ " +
+      message;
+
+    status.className =
+      "status red";
+
+
+    alert(
+      "❌ " +
+      message
+    );
+
+  }
+
+
+  button.disabled =
+    false;
+
+  button.innerText =
+    "💰 Request Payout";
+
+}
+
+
+/* ================= PAYOUT HISTORY ================= */
+
+async function loadPayoutHistory() {
+
+  if (
+    !tg ||
+    !tg.initData
+  ) {
+    return;
+  }
+
+
+  const container =
+    document.getElementById(
+      "payoutHistory"
+    );
+
+
+  try {
+
+    const result =
+      await api(
+        "/payouts",
+        {
+          initData:
+            tg.initData
+        }
+      );
+
+
+    if (
+      !result ||
+      !Array.isArray(
+        result.payouts
+      ) ||
+      result.payouts.length === 0
+    ) {
+
+      container.innerText =
+        "No payout history.";
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      "";
+
+
+    result.payouts.forEach(
+      payout => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "small-card";
+
+
+        const status =
+          payout.status ||
+          "pending";
+
+
+        let statusClass =
+          "yellow";
+
+
+        if (
+          status === "paid"
+        ) {
+
+          statusClass =
+            "green";
+
+        }
+
+
+        if (
+          status === "rejected"
+        ) {
+
+          statusClass =
+            "red";
+
+        }
+
+
+        div.innerHTML =
+          "<b>" +
+          Number(
+            payout.amount
+          ).toLocaleString() +
+          " GALAXY</b> " +
+          "($"
+          +
+          Number(
+            payout.usdt || 0
+          ).toFixed(2) +
+          " USDT)" +
+          "<br>" +
+          "<span class='" +
+          statusClass +
+          "'>" +
+          status.toUpperCase() +
+          "</span>" +
+          "<br>" +
+          "<span class='muted'>" +
+          (
+            payout.createdAt
+              ? new Date(
+                  payout.createdAt
+                ).toLocaleString()
+              : ""
+          ) +
+          "</span>";
+
+
+        container.appendChild(
+          div
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "PAYOUT HISTORY ERROR:",
+      error
+    );
+
+    container.innerText =
+      "Unable to load payout history.";
+
+  }
 
 }
 
