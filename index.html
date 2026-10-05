@@ -10,80 +10,197 @@
 
   <title>USDT Galaxy</title>
 
-  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      background: #05070d;
+      background:
+        radial-gradient(circle at top, #18233d 0%, #080b13 45%, #05070d 100%);
       color: white;
       font-family: Arial, sans-serif;
       user-select: none;
+      min-height: 100vh;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: auto;
+      padding: 16px;
+      padding-bottom: 100px;
     }
 
     .card {
       background: linear-gradient(
         145deg,
-        rgba(20, 25, 40, 0.95),
-        rgba(8, 11, 20, 0.95)
+        rgba(25, 32, 52, 0.96),
+        rgba(9, 13, 24, 0.96)
       );
 
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
     }
 
-    .earn-btn {
+    .balance-card {
+      background:
+        radial-gradient(
+          circle at 85% 15%,
+          rgba(59,130,246,0.35),
+          transparent 35%
+        ),
+        linear-gradient(
+          145deg,
+          #182a52,
+          #0a1020
+        );
+    }
+
+    .primary-btn {
       width: 100%;
       padding: 14px;
-      border-radius: 14px;
-      font-weight: bold;
+      border-radius: 15px;
+      font-weight: 700;
       background: #2563eb;
-      margin-top: 10px;
       color: white;
+      transition: 0.15s;
     }
 
-    .earn-btn:disabled {
+    .primary-btn:active {
+      transform: scale(0.98);
+    }
+
+    .primary-btn:disabled {
       opacity: 0.5;
+    }
+
+    .task-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 480px;
+      margin: auto;
+      padding: 10px 12px 12px;
+      background: rgba(5,7,13,0.96);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      z-index: 50;
+    }
+
+    .nav-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: #8d96a8;
+      border-radius: 13px;
+      padding: 9px 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .nav-btn.active {
+      color: white;
+      background: rgba(37,99,235,0.18);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .stat-box {
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 13px;
+    }
+
+    .input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      color: white;
+      border-radius: 13px;
+      padding: 13px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: #2563eb;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="max-w-md mx-auto p-4">
+<div class="app">
 
-    <!-- HEADER -->
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
 
-    <div class="flex justify-between items-center mb-5">
+  <div class="flex justify-between items-center mb-5">
 
-      <div>
-        <h1 class="text-2xl font-bold">
-          🌌 USDT Galaxy
-        </h1>
+    <div>
+      <h1 class="text-2xl font-bold">
+        🌌 USDT Galaxy
+      </h1>
 
-        <p class="text-gray-400 text-sm">
-          Watch & Earn
-        </p>
-      </div>
-
-      <div
-        id="statusDot"
-        class="text-green-400 text-sm"
+      <p
+        id="welcomeText"
+        class="text-gray-400 text-sm mt-1"
       >
-        ● Online
-      </div>
-
+        Welcome to Galaxy
+      </p>
     </div>
 
+    <div
+      id="statusDot"
+      class="text-green-400 text-sm"
+    >
+      ● Online
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- HOME -->
+  <!-- ========================= -->
+
+  <section
+    id="homePage"
+    class="page active"
+  >
 
     <!-- BALANCE -->
 
-    <div class="card p-5 mb-5">
+    <div class="balance-card card p-5 mb-4">
 
-      <p class="text-gray-400 text-sm">
+      <p class="text-gray-300 text-sm">
         Your Galaxy Balance
       </p>
 
@@ -94,13 +211,13 @@
         Loading...
       </div>
 
-      <p class="text-gray-400 mt-2">
+      <p class="text-gray-400 mt-1">
         GALAXY
       </p>
 
       <div
         id="usdtValue"
-        class="text-green-400 mt-2"
+        class="text-green-400 mt-3"
       >
         ≈ $0.00 USDT
       </div>
@@ -108,182 +225,489 @@
     </div>
 
 
-    <!-- WATCH & EARN -->
+    <!-- QUICK STATS -->
 
-    <div class="card p-5">
+    <div class="grid grid-cols-2 gap-3 mb-4">
 
-      <h2 class="text-xl font-bold mb-1">
-        🎬 Watch & Earn
-      </h2>
+      <div class="stat-box">
 
-      <p class="text-gray-400 text-sm mb-4">
-        Watch the video and earn 100 GALAXY.
-      </p>
+        <p class="text-gray-400 text-xs">
+          Total Earned
+        </p>
 
-
-      <!-- VIDEO 1 -->
-
-      <div class="border border-gray-700 rounded-xl p-4 mb-4">
-
-        <div class="font-bold">
-          🎥 Galaxy Video #1
-        </div>
-
-        <div class="text-gray-400 text-sm mt-1">
-          Reward: +100 GALAXY
-        </div>
-
-        <button
-          id="video1Btn"
-          class="earn-btn"
-          onclick="watchYouTube(
-            'https://youtu.be/unTAEBvggus',
-            'video1',
-            this
-          )"
+        <p
+          id="totalEarned"
+          class="text-lg font-bold mt-1"
         >
-          ▶️ Watch Video & Earn
-        </button>
+          0
+        </p>
 
       </div>
 
+      <div class="stat-box">
 
-      <!-- VIDEO 2 -->
+        <p class="text-gray-400 text-xs">
+          Referrals
+        </p>
 
-      <div class="border border-gray-700 rounded-xl p-4 mb-4">
-
-        <div class="font-bold">
-          🎥 Galaxy Video #2
-        </div>
-
-        <div class="text-gray-400 text-sm mt-1">
-          Reward: +100 GALAXY
-        </div>
-
-        <button
-          id="video2Btn"
-          class="earn-btn"
-          onclick="watchYouTube(
-            'https://youtu.be/Hja_iwEkfmI',
-            'video2',
-            this
-          )"
+        <p
+          id="referralCount"
+          class="text-lg font-bold mt-1"
         >
-          ▶️ Watch Video & Earn
-        </button>
-
-      </div>
-
-
-      <!-- VIDEO 3 -->
-
-      <div class="border border-gray-700 rounded-xl p-4">
-
-        <div class="font-bold">
-          🎥 Galaxy Video #3
-        </div>
-
-        <div class="text-gray-400 text-sm mt-1">
-          Reward: +100 GALAXY
-        </div>
-
-        <button
-          id="video3Btn"
-          class="earn-btn"
-          onclick="watchYouTube(
-            'https://youtu.be/I5mLBbsuAdA',
-            'video3',
-            this
-          )"
-        >
-          ▶️ Watch Video & Earn
-        </button>
+          0
+        </p>
 
       </div>
 
     </div>
 
 
-    <!-- DEBUG -->
+    <!-- HOME ACTION -->
 
-    <div
-      id="debug"
-      class="text-xs text-gray-500 mt-5 break-all"
-    ></div>
+    <div class="card p-5">
+
+      <h2 class="text-xl font-bold">
+        🚀 Start Earning
+      </h2>
+
+      <p class="text-gray-400 text-sm mt-1 mb-4">
+        Complete tasks and grow your Galaxy balance.
+      </p>
+
+      <button
+        class="primary-btn"
+        onclick="showPage('tasks')"
+      >
+        🎬 Watch & Earn
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- TASKS -->
+  <!-- ========================= -->
+
+  <section
+    id="tasksPage"
+    class="page"
+  >
+
+    <div class="card p-5 mb-4">
+
+      <h2 class="text-xl font-bold">
+        🎬 Watch & Earn
+      </h2>
+
+      <p class="text-gray-400 text-sm mt-1">
+        Complete the available tasks and earn GALAXY.
+      </p>
+
+    </div>
+
+
+    <!-- VIDEO 1 -->
+
+    <div class="task-card mb-3">
+
+      <div class="flex justify-between">
+
+        <div>
+
+          <div class="font-bold">
+            🎥 Galaxy Video #1
+          </div>
+
+          <div class="text-gray-400 text-sm mt-1">
+            Watch & earn 100 GALAXY
+          </div>
+
+        </div>
+
+        <div class="text-green-400 font-bold">
+          +100
+        </div>
+
+      </div>
+
+      <button
+        id="video1Btn"
+        class="primary-btn mt-4"
+        onclick="watchYouTube(
+          'https://youtu.be/unTAEBvggus',
+          'video1',
+          this
+        )"
+      >
+        ▶️ Watch & Earn
+      </button>
+
+    </div>
+
+
+    <!-- VIDEO 2 -->
+
+    <div class="task-card mb-3">
+
+      <div class="flex justify-between">
+
+        <div>
+
+          <div class="font-bold">
+            🎥 Galaxy Video #2
+          </div>
+
+          <div class="text-gray-400 text-sm mt-1">
+            Watch & earn 100 GALAXY
+          </div>
+
+        </div>
+
+        <div class="text-green-400 font-bold">
+          +100
+        </div>
+
+      </div>
+
+      <button
+        id="video2Btn"
+        class="primary-btn mt-4"
+        onclick="watchYouTube(
+          'https://youtu.be/Hja_iwEkfmI',
+          'video2',
+          this
+        )"
+      >
+        ▶️ Watch & Earn
+      </button>
+
+    </div>
+
+
+    <!-- VIDEO 3 -->
+
+    <div class="task-card">
+
+      <div class="flex justify-between">
+
+        <div>
+
+          <div class="font-bold">
+            🎥 Galaxy Video #3
+          </div>
+
+          <div class="text-gray-400 text-sm mt-1">
+            Watch & earn 100 GALAXY
+          </div>
+
+        </div>
+
+        <div class="text-green-400 font-bold">
+          +100
+        </div>
+
+      </div>
+
+      <button
+        id="video3Btn"
+        class="primary-btn mt-4"
+        onclick="watchYouTube(
+          'https://youtu.be/I5mLBbsuAdA',
+          'video3',
+          this
+        )"
+      >
+        ▶️ Watch & Earn
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- REFERRAL -->
+  <!-- ========================= -->
+
+  <section
+    id="referralPage"
+    class="page"
+  >
+
+    <div class="card p-5">
+
+      <h2 class="text-xl font-bold">
+        👥 Invite Crew
+      </h2>
+
+      <p class="text-gray-400 text-sm mt-1 mb-5">
+        Invite friends and grow your Galaxy community.
+      </p>
+
+
+      <div class="stat-box mb-4">
+
+        <p class="text-gray-400 text-sm">
+          Your Referral Count
+        </p>
+
+        <p
+          id="referralBig"
+          class="text-3xl font-bold mt-1"
+        >
+          0
+        </p>
+
+      </div>
+
+
+      <p class="text-gray-400 text-sm mb-2">
+        Your referral link
+      </p>
+
+      <input
+        id="referralLink"
+        class="input"
+        readonly
+        value="Loading..."
+      >
+
+
+      <button
+        class="primary-btn mt-3"
+        onclick="shareReferral()"
+      >
+        🚀 Invite Friends
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- PROFILE -->
+  <!-- ========================= -->
+
+  <section
+    id="profilePage"
+    class="page"
+  >
+
+    <div class="card p-5">
+
+      <div class="flex items-center gap-4 mb-5">
+
+        <div
+          id="profileAvatar"
+          class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold"
+        >
+          US
+        </div>
+
+        <div>
+
+          <div
+            id="profileName"
+            class="text-xl font-bold"
+          >
+            User
+          </div>
+
+          <div
+            id="profileUsername"
+            class="text-gray-400 text-sm"
+          >
+            Telegram User
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <div class="stat-box">
+
+          <p class="text-gray-400 text-xs">
+            Balance
+          </p>
+
+          <p
+            id="profileBalance"
+            class="font-bold mt-1"
+          >
+            0 GALAXY
+          </p>
+
+        </div>
+
+        <div class="stat-box">
+
+          <p class="text-gray-400 text-xs">
+            Total Earned
+          </p>
+
+          <p
+            id="profileEarned"
+            class="font-bold mt-1"
+          >
+            0 GALAXY
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- PAYOUT -->
+
+    <div class="card p-5 mt-4">
+
+      <h2 class="text-lg font-bold">
+        💳 Payout
+      </h2>
+
+      <p class="text-gray-400 text-sm mt-1">
+        Withdraw your GALAXY earnings as USDT.
+      </p>
+
+      <button
+        class="primary-btn mt-4"
+        onclick="showPayoutMessage()"
+      >
+        💰 Open Payout
+      </button>
+
+    </div>
+
+
+    <!-- REDEEM -->
+
+    <div class="card p-5 mt-4">
+
+      <h2 class="text-lg font-bold">
+        🎁 Redeem Code
+      </h2>
+
+      <p class="text-gray-400 text-sm mt-1 mb-4">
+        Enter a reward code.
+      </p>
+
+      <input
+        id="redeemInput"
+        class="input"
+        placeholder="Enter redeem code"
+      >
+
+      <button
+        class="primary-btn mt-3"
+        onclick="redeemCode()"
+      >
+        🎁 Redeem
+      </button>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- BOTTOM NAVIGATION -->
+<!-- ========================= -->
+
+<div class="nav">
+
+  <div class="nav-inner">
+
+    <button
+      id="navHome"
+      class="nav-btn active"
+      onclick="showPage('home')"
+    >
+      🏠<br>
+      Home
+    </button>
+
+    <button
+      id="navTasks"
+      class="nav-btn"
+      onclick="showPage('tasks')"
+    >
+      🎬<br>
+      Earn
+    </button>
+
+    <button
+      id="navReferral"
+      class="nav-btn"
+      onclick="showPage('referral')"
+    >
+      👥<br>
+      Invite
+    </button>
+
+    <button
+      id="navProfile"
+      class="nav-btn"
+      onclick="showPage('profile')"
+    >
+      👤<br>
+      Profile
+    </button>
 
   </div>
+
+</div>
 
 
 <script>
 
-  // ==========================================
-  // RAILWAY BACKEND
-  // ==========================================
+  // ==================================================
+  // CONFIG
+  // ==================================================
 
   const API =
     "https://usdtbot-production-89e9.up.railway.app";
 
 
-  // ==========================================
-  // TELEGRAM MINI APP
-  // ==========================================
+  // ==================================================
+  // TELEGRAM
+  // ==================================================
 
-  const tg = window.Telegram.WebApp;
-
-
-  // ==========================================
-  // DEBUG POPUP
-  // ==========================================
-
-  alert(
-    "TG version: " +
-      (tg.version || "NONE") +
-
-    "\nPlatform: " +
-      (tg.platform || "NONE") +
-
-    "\ninitData length: " +
-      (tg.initData ? tg.initData.length : 0) +
-
-    "\nUser ID: " +
-      (tg.initDataUnsafe?.user?.id || "NONE")
-  );
-
-
-  // Telegram Mini App initialize
+  const tg =
+    window.Telegram.WebApp;
 
   tg.ready();
   tg.expand();
 
 
-  // ==========================================
-  // ELEMENTS
-  // ==========================================
+  // ==================================================
+  // USER
+  // ==================================================
 
-  const balanceElement =
-    document.getElementById("balance");
-
-  const usdtElement =
-    document.getElementById("usdtValue");
-
-  const debugElement =
-    document.getElementById("debug");
+  const telegramUser =
+    tg.initDataUnsafe?.user || null;
 
 
-  // ==========================================
-  // DEBUG MESSAGE
-  // ==========================================
+  // ==================================================
+  // STATE
+  // ==================================================
 
-  function showDebug(message) {
-
-    debugElement.innerText = message;
-
-  }
+  let currentBalance = 0;
+  let totalEarned = 0;
 
 
-  // ==========================================
-  // TELEGRAM SESSION CHECK
-  // ==========================================
+  // ==================================================
+  // TELEGRAM SESSION
+  // ==================================================
 
   function telegramSessionAvailable() {
 
@@ -296,53 +720,139 @@
   }
 
 
-  // ==========================================
-  // UPDATE BALANCE
-  // ==========================================
+  // ==================================================
+  // UPDATE USER UI
+  // ==================================================
 
-  function updateBalance(balance) {
+  function updateUserUI() {
 
-    const amount =
-      Number(balance || 0);
+    if (!telegramUser) {
+      return;
+    }
 
-    balanceElement.innerText =
-      amount.toLocaleString();
+    const firstName =
+      telegramUser.first_name ||
+      "Galaxy User";
 
-    const usdt =
-      (amount * 0.0001).toFixed(2);
+    const username =
+      telegramUser.username
+        ? "@" + telegramUser.username
+        : "Telegram User";
 
-    usdtElement.innerText =
-      "≈ $" + usdt + " USDT";
+    document.getElementById(
+      "welcomeText"
+    ).innerText =
+      "Welcome, " + firstName;
+
+
+    document.getElementById(
+      "profileName"
+    ).innerText =
+      firstName;
+
+
+    document.getElementById(
+      "profileUsername"
+    ).innerText =
+      username;
+
+
+    const initials =
+      (
+        firstName
+          .substring(0, 2)
+          .toUpperCase()
+      );
+
+    document.getElementById(
+      "profileAvatar"
+    ).innerText =
+      initials;
+
+
+    // Referral link
+
+    const botUsername =
+      "USDTGalaxyProRobot";
+
+    const userId =
+      telegramUser.id;
+
+    const referralLink =
+      "https://t.me/" +
+      botUsername +
+      "?start=" +
+      userId;
+
+    document.getElementById(
+      "referralLink"
+    ).value =
+      referralLink;
 
   }
 
 
-  // ==========================================
+  // ==================================================
+  // UPDATE BALANCE
+  // ==================================================
+
+  function updateBalance(balance) {
+
+    currentBalance =
+      Number(balance || 0);
+
+    document.getElementById(
+      "balance"
+    ).innerText =
+      currentBalance.toLocaleString();
+
+
+    const usdt =
+      (
+        currentBalance *
+        0.0001
+      ).toFixed(2);
+
+    document.getElementById(
+      "usdtValue"
+    ).innerText =
+      "≈ $" +
+      usdt +
+      " USDT";
+
+
+    document.getElementById(
+      "profileBalance"
+    ).innerText =
+      currentBalance.toLocaleString() +
+      " GALAXY";
+
+  }
+
+
+  // ==================================================
   // LOAD BALANCE
-  // ==========================================
+  // ==================================================
 
   async function loadBalance() {
 
-    if (!telegramSessionAvailable()) {
+    if (
+      !telegramSessionAvailable()
+    ) {
 
-      balanceElement.innerText =
+      document.getElementById(
+        "balance"
+      ).innerText =
         "Telegram Only";
 
-      usdtElement.innerText =
-        "Open this Mini App from the Telegram bot.";
-
-      showDebug(
-        "Telegram initData is missing."
-      );
+      document.getElementById(
+        "usdtValue"
+      ).innerText =
+        "Open this app from Telegram.";
 
       return;
 
     }
-
-
-    showDebug(
-      "Telegram session detected. Loading balance..."
-    );
 
 
     try {
@@ -354,12 +864,15 @@
             method: "POST",
 
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type":
+                "application/json"
             },
 
-            body: JSON.stringify({
-              initData: tg.initData
-            })
+            body:
+              JSON.stringify({
+                initData:
+                  tg.initData
+              })
           }
         );
 
@@ -368,34 +881,15 @@
         await response.json();
 
 
-      if (!response.ok) {
+      if (
+        !response.ok ||
+        !data.success
+      ) {
 
-        console.error(data);
-
-        balanceElement.innerText =
-          "Error";
-
-        showDebug(
-          "Server error: " +
-          (data.error || response.status)
+        throw new Error(
+          data.error ||
+          "Balance sync failed"
         );
-
-        return;
-
-      }
-
-
-      if (!data.success) {
-
-        balanceElement.innerText =
-          "Error";
-
-        showDebug(
-          "Sync failed: " +
-          (data.error || "Unknown error")
-        );
-
-        return;
 
       }
 
@@ -405,29 +899,26 @@
       );
 
 
-      showDebug(
-        "Balance synced successfully."
-      );
-
     } catch (error) {
 
-      console.error(error);
-
-      balanceElement.innerText =
-        "Offline";
-
-      showDebug(
-        "Backend connection failed."
+      console.error(
+        "Balance error:",
+        error
       );
+
+      document.getElementById(
+        "balance"
+      ).innerText =
+        "Error";
 
     }
 
   }
 
 
-  // ==========================================
-  // WATCH VIDEO + EARN
-  // ==========================================
+  // ==================================================
+  // WATCH + EARN
+  // ==================================================
 
   async function watchYouTube(
     videoUrl,
@@ -435,17 +926,15 @@
     button
   ) {
 
-
-    // Check Telegram session
-
-    if (!telegramSessionAvailable()) {
+    if (
+      !telegramSessionAvailable()
+    ) {
 
       tg.showAlert(
-        "Please open this Mini App from the Telegram bot."
+        "Please open the Mini App from Telegram."
       );
 
       return;
-
     }
 
 
@@ -457,11 +946,6 @@
 
     try {
 
-
-      // ======================================
-      // SEND EARN REQUEST
-      // ======================================
-
       const response =
         await fetch(
           API + "/earn",
@@ -469,18 +953,20 @@
             method: "POST",
 
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type":
+                "application/json"
             },
 
-            body: JSON.stringify({
+            body:
+              JSON.stringify({
 
-              initData:
-                tg.initData,
+                initData:
+                  tg.initData,
 
-              taskId:
-                taskId
+                taskId:
+                  taskId
 
-            })
+              })
           }
         );
 
@@ -488,10 +974,6 @@
       const data =
         await response.json();
 
-
-      // ======================================
-      // CHECK RESPONSE
-      // ======================================
 
       if (
         !response.ok ||
@@ -506,22 +988,38 @@
       }
 
 
-      // ======================================
-      // UPDATE BALANCE
-      // ======================================
-
       updateBalance(
         data.balance
       );
 
 
-      // ======================================
-      // OPEN YOUTUBE
-      // ======================================
+      totalEarned +=
+        Number(
+          data.earned || 100
+        );
+
+
+      document.getElementById(
+        "totalEarned"
+      ).innerText =
+        totalEarned.toLocaleString();
+
+
+      document.getElementById(
+        "profileEarned"
+      ).innerText =
+        totalEarned.toLocaleString() +
+        " GALAXY";
+
+
+      button.innerText =
+        "✅ Earned +100 GALAXY";
+
 
       if (
         tg &&
-        typeof tg.openLink === "function"
+        typeof tg.openLink ===
+          "function"
       ) {
 
         tg.openLink(
@@ -537,34 +1035,24 @@
 
       }
 
-
-      // ======================================
-      // SUCCESS
-      // ======================================
-
-      button.innerText =
-        "✅ Earned +100 GALAXY";
-
-
-      showDebug(
-        "Reward added successfully. New balance: " +
-        data.balance
-      );
-
-
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Earn error:",
+        error
+      );
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
       button.innerText =
-        "▶️ Watch Video & Earn";
+        "▶️ Watch & Earn";
 
 
       if (
         tg &&
-        typeof tg.showAlert === "function"
+        typeof tg.showAlert ===
+          "function"
       ) {
 
         tg.showAlert(
@@ -573,21 +1061,183 @@
 
       }
 
-
-      showDebug(
-        "Earn error: " +
-        error.message
-      );
-
     }
 
   }
 
 
-  // ==========================================
-  // START APP
-  // ==========================================
+  // ==================================================
+  // PAGE NAVIGATION
+  // ==================================================
 
+  function showPage(page) {
+
+    const pages = [
+      "home",
+      "tasks",
+      "referral",
+      "profile"
+    ];
+
+
+    pages.forEach(
+      name => {
+
+        const element =
+          document.getElementById(
+            name + "Page"
+          );
+
+        if (element) {
+
+          element.classList.toggle(
+            "active",
+            name === page
+          );
+
+        }
+
+      }
+    );
+
+
+    const navButtons = [
+      "navHome",
+      "navTasks",
+      "navReferral",
+      "navProfile"
+    ];
+
+
+    navButtons.forEach(
+      id => {
+
+        document
+          .getElementById(id)
+          .classList.remove(
+            "active"
+          );
+
+      }
+    );
+
+
+    const activeNav =
+      document.getElementById(
+        "nav" +
+        page.charAt(0).toUpperCase() +
+        page.slice(1)
+      );
+
+
+    if (activeNav) {
+      activeNav.classList.add(
+        "active"
+      );
+    }
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  // ==================================================
+  // SHARE REFERRAL
+  // ==================================================
+
+  function shareReferral() {
+
+    const link =
+      document.getElementById(
+        "referralLink"
+      ).value;
+
+    const shareText =
+      "🚀 Join me on USDT Galaxy and start earning GALAXY!";
+
+
+    if (
+      tg &&
+      typeof tg.openTelegramLink ===
+        "function"
+    ) {
+
+      const url =
+        "https://t.me/share/url?url=" +
+        encodeURIComponent(link) +
+        "&text=" +
+        encodeURIComponent(
+          shareText
+        );
+
+      tg.openTelegramLink(
+        url
+      );
+
+      return;
+    }
+
+
+    window.open(
+      link,
+      "_blank"
+    );
+
+  }
+
+
+  // ==================================================
+  // PAYOUT
+  // ==================================================
+
+  function showPayoutMessage() {
+
+    tg.showAlert(
+      "Payout system is being connected. Your balance is safe."
+    );
+
+  }
+
+
+  // ==================================================
+  // REDEEM
+  // ==================================================
+
+  function redeemCode() {
+
+    const code =
+      document.getElementById(
+        "redeemInput"
+      ).value
+      .trim();
+
+
+    if (!code) {
+
+      tg.showAlert(
+        "Please enter a redeem code."
+      );
+
+      return;
+    }
+
+
+    tg.showAlert(
+      "Redeem system is being connected."
+    );
+
+  }
+
+
+  // ==================================================
+  // START
+  // ==================================================
+
+  updateUserUI();
   loadBalance();
 
 </script>
