@@ -3,124 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Earn Bot</title>
+    <title>USDT Galaxy - Earn Studio</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { background: radial-gradient(circle at top, #1b103f, #090614); color: #ffffff; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
-        .header { text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold; color: #9d4edd; }
-        .balance-card { background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .balance-card h1 { margin: 10px 0; font-size: 42px; color: #e0aaff; }
-        .usdt-value { font-size: 18px; color: #53f2c3; font-weight: bold; margin-bottom: 5px;}
-        .task-container { display: flex; flex-direction: column; gap: 15px; }
-        .task-card { background: #16102b; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2d2154; }
-        .task-info h3 { margin: 0 0 5px 0; font-size: 16px; }
-        .task-info p { margin: 0; color: #e0aaff; font-size: 14px; font-weight: bold; }
-        .watch-btn { background: #7b2cbf; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .watch-btn:disabled { background: #2a2245; color: #635787; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="header">🌌 GALAXY EARN STUDIO</div>
-    <div class="balance-card">
-        <p>TOTAL BALANCE</p>
-        <h1 id="balance">500</h1>
-        <div class="usdt-value" id="usdt-balance">≈ $0.05 USDT</div>
-        <p>💫 GALAXY</p>
+<body class="bg-[#0f0c1b] text-white min-h-screen flex flex-col items-center p-4">
+    
+    <div class="w-full max-w-md bg-[#1a1533] rounded-2xl p-6 shadow-xl border border-purple-900/50 mt-4 text-center">
+        <h1 class="text-xl font-bold tracking-wider text-purple-300 mb-2">GALAXY EARN STUDIO</h1>
+        
+        <p class="text-xs text-gray-400 uppercase tracking-widest mt-4">Total Balance</p>
+        <div id="balanceDisplay" class="text-4xl font-extrabold text-purple-200 my-2">500</div>
+        <div class="text-sm text-green-400 font-medium mb-6">≈ $<span id="usdtDisplay">0.05</span> USDT</div>
+        
+        <!-- Task List -->
+        <div class="space-y-3">
+            <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
+                <div class="text-left">
+                    <p class="font-semibold text-sm">Watch Video #1</p>
+                    <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
+                </div>
+                <button onclick="earnTokens(100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
+            </div>
+            
+            <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
+                <div class="text-left">
+                    <p class="font-semibold text-sm">Watch Video #2</p>
+                    <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
+                </div>
+                <button onclick="earnTokens(100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
+            </div>
+            
+            <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
+                <div class="text-left">
+                    <p class="font-semibold text-sm">Watch Video #3</p>
+                    <p class="text-xs text-purple-300">+100 GALAXY ($0.01)</p>
+                </div>
+                <button onclick="earnTokens(100)" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition">WATCH</button>
+            </div>
+        </div>
     </div>
 
-    <h3 style="color: #c4b5fd; font-size: 16px; text-transform: uppercase;">📺 Daily Tasks (Refreshes in 1 min)</h3>
-    <div class="task-container" id="task-container"></div>
-
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand(); 
+        let tg = window.Telegram.WebApp;
+        tg.expand();
         
-        // ID catch karne ka sabse solid tareeqa
+        // Telegram se User ID nikalna
+        let userId = tg.initDataUnsafe?.user?.id;
         const urlParams = new URLSearchParams(window.location.search);
-        let userId = tg.initDataUnsafe?.user?.id || urlParams.get('userid'); 
+        if (!userId) {
+            userId = urlParams.get('userid') || '123456789';
+        }
 
-        let galaxyBalance = parseInt(localStorage.getItem('galaxy_balance')) || 500; 
-        const usdtRate = 0.0001; 
+        let currentBalance = parseInt(localStorage.getItem('galaxy_balance')) || 500;
+        updateUI();
 
-        const videoPool = [
-            { url: "https://youtu.be/_hzf9W746hk?si=7EkyntxrRJyMRNUA" },
-            { url: "https://youtu.be/p3AlcT7qGGM?si=ehkyBtHuyYblyS9s" },
-            { url: "https://youtu.be/CCDFnBjzbPM?si=SQP9MS-MCs7aofVG" }
-        ];
+        function updateUI() {
+            document.getElementById('balanceDisplay').innerText = currentBalance;
+            document.getElementById('usdtDisplay').innerText = (currentBalance * 0.0001).toFixed(2);
+        }
 
-        let lastResetTime = localStorage.getItem('last_reset_time');
-        let currentTime = new Date().getTime();
+        function earnTokens(amount) {
+            currentBalance += amount;
+            localStorage.setItem('galaxy_balance', currentBalance);
+            updateUI();
+            syncWithBackend(currentBalance);
+        }
+
+        async function syncWithBackend(newBalance) {
+            try {
+                let response = await fetch('https://usdtbot-production-89e9.up.railway.app/sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: userId, balance: newBalance })
+                });
+                let data = await response.json();
+                console.log('Synced successfully:', data);
+            } catch (error) {
+                console.error('Error linking to Railway:', error);
+            }
+        }
         
-        if (!lastResetTime || (currentTime - lastResetTime > 60 * 1000)) {
-            localStorage.setItem('todays_videos', JSON.stringify(videoPool));
-            localStorage.setItem('last_reset_time', currentTime);
-            localStorage.setItem('completed_tasks', JSON.stringify([]));
-        }
-
-        let selectedVideos = JSON.parse(localStorage.getItem('todays_videos'));
-        let completedTasks = JSON.parse(localStorage.getItem('completed_tasks')) || [];
-
-        updateDisplay();
-        const taskContainer = document.getElementById('task-container');
-        
-        selectedVideos.forEach((video, index) => {
-            let taskId = index + 1; 
-            let isDone = completedTasks.includes(taskId);
-
-            taskContainer.innerHTML += `
-                <div class="task-card">
-                    <div class="task-info">
-                        <h3>Watch Video #${taskId}</h3>
-                        <p>+ 100 GALAXY ($0.01)</p>
-                    </div>
-                    <button class="watch-btn" id="btn${taskId}" onclick="startTask(${taskId}, '${video.url}', 100)" ${isDone ? 'disabled' : ''}>
-                        ${isDone ? 'DONE' : 'WATCH'}
-                    </button>
-                </div>
-            `;
-        });
-
-        function updateDisplay() {
-            document.getElementById('balance').innerText = galaxyBalance;
-            document.getElementById('usdt-balance').innerText = `≈ $${(galaxyBalance * usdtRate).toFixed(2)} USDT`;
-            localStorage.setItem('galaxy_balance', galaxyBalance);
-        }
-
-        function startTask(taskId, videoUrl, reward) {
-            tg.openLink(videoUrl);
-            let btn = document.getElementById('btn' + taskId);
-            btn.innerText = 'PLAYING...';
-            btn.disabled = true;
-
-            setTimeout(() => {
-                galaxyBalance += reward;
-                updateDisplay();
-                completedTasks.push(taskId);
-                localStorage.setItem('completed_tasks', JSON.stringify(completedTasks));
-
-                btn.innerText = 'DONE';
-                tg.HapticFeedback.notificationOccurred('success');
-
-                if (userId) {
-                    tg.showAlert('⏳ Syncing balance to Database...'); 
-                    
-                    fetch('https://indexjs-production-3a24.up.railway.app/sync', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId: userId, balance: galaxyBalance })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        tg.showAlert('✅ Success! Balance permanently saved.');
-                    })
-                    .catch(err => {
-                        tg.showAlert('❌ Error linking to Railway: ' + err.message); 
-                    });
-                } else {
-                    tg.showAlert('⚠️ Error: User ID nahi mili. Kripya /start type karke naye button se app kholen.');
-                }
-            }, 10000); 
-        }
+        // App khulte hi automatic sync karega
+        syncWithBackend(currentBalance);
     </script>
 </body>
 </html>
