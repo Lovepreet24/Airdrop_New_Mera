@@ -2464,4 +2464,61 @@
 
       document.getElementById(
         "statusDot"
-      ).
+      ).innerText =
+        "● User Missing";
+
+      document.getElementById(
+        "statusDot"
+      ).className =
+        "text-red-400 text-sm";
+
+    }
+
+
+    if (!hasInitData()) {
+
+      document.getElementById(
+        "statusDot"
+      ).innerText =
+        "● Session Missing";
+
+      document.getElementById(
+        "statusDot"
+      ).className =
+        "text-red-400 text-sm";
+
+
+      document.getElementById(
+        "gateMessage"
+      ).innerText =
+        "Telegram session data is missing. Close this Mini App and open it again from @USDTGalaxyProRobot.";
+
+
+      document.getElementById(
+        "gateMessage"
+      ).className =
+        "error-text text-center";
+
+
+      return;
+    }
+
+
+    // Automatically check channels
+    // when the Mini App opens.
+
+    await checkChannels();
+
+  }
+
+
+  // ==================================================
+  // START
+  // ==================================================
+
+  init();
+
+</script>
+
+</body>
+</html>
