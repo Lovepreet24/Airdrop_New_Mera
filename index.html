@@ -906,11 +906,6 @@ const API =
 const BOT =
   "USDTGalaxyProRobot";
 
-/*
-  IMPORTANT:
-  Telegram WebApp object is assigned later after
-  Telegram SDK is fully available.
-*/
 let tg = null;
 
 let user = null;
@@ -1532,15 +1527,24 @@ async function syncUser() {
       {};
 
     updateBalance(
-      backendUser.balance ||
-      result.balance ||
+      backendUser.balance ??
+      result.balance ??
       0
     );
 
+    /*
+      IMPORTANT:
+      Supabase column is referral_count.
+      Previously frontend was reading referrals,
+      which caused the UI to show 0 even when
+      database had referral_count = 1.
+    */
     referralCount =
       Number(
-        result.referrals ||
-        backendUser.referrals ||
+        backendUser.referral_count ??
+        result.referral_count ??
+        result.referrals ??
+        backendUser.referrals ??
         0
       );
 
@@ -1556,13 +1560,13 @@ async function syncUser() {
 
     referralReward =
       Number(
-        result.referralReward ||
+        result.referralReward ??
         100
       );
 
     minimumWithdrawal =
       Number(
-        result.minWithdrawal ||
+        result.minWithdrawal ??
         500
       );
 
@@ -2322,6 +2326,13 @@ function setupTelegramEvents() {
             }
 
             updateUser();
+
+            /*
+              Refresh user data whenever
+              Telegram activates the Mini App.
+              This also refreshes referral count.
+            */
+            await syncUser();
           }
         }
       );
@@ -2400,6 +2411,14 @@ document.addEventListener(
           setupTelegramEvents();
           updateUser();
         }
+
+      } else {
+
+        /*
+          Re-sync when Mini App comes
+          back into the foreground.
+        */
+        await syncUser();
       }
     }
   }
