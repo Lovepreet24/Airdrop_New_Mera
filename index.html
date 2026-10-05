@@ -837,7 +837,6 @@
           Submit a withdrawal request. Payment is processed manually.
         </p>
 
-
         <input
           id="payoutAmount"
           class="input mb-3"
@@ -846,13 +845,11 @@
           placeholder="Amount in GALAXY"
         >
 
-
         <input
           id="walletAddress"
           class="input"
           placeholder="USDT wallet address"
         >
-
 
         <button
           id="payoutBtn"
@@ -861,7 +858,6 @@
         >
           💰 Request Payout
         </button>
-
 
         <p class="text-gray-500 text-xs mt-3">
           Minimum payout: 1000 GALAXY
@@ -882,13 +878,11 @@
           Enter a reward code.
         </p>
 
-
         <input
           id="redeemInput"
           class="input"
           placeholder="Enter redeem code"
         >
-
 
         <button
           class="primary-btn mt-3"
@@ -925,7 +919,6 @@
       Home
     </button>
 
-
     <button
       id="navTasks"
       class="nav-btn"
@@ -935,7 +928,6 @@
       Earn
     </button>
 
-
     <button
       id="navReferral"
       class="nav-btn"
@@ -944,7 +936,6 @@
       👥<br>
       Invite
     </button>
-
 
     <button
       id="navProfile"
@@ -1006,13 +997,9 @@
   // ==================================================
 
   let currentBalance = 0;
-
   let totalEarned = 0;
-
   let referralCount = 0;
-
   let channelsVerified = false;
-
   let checkingChannels = false;
 
 
@@ -1021,13 +1008,11 @@
   // ==================================================
 
   function hasInitData() {
-
     return !!(
       tg &&
       typeof tg.initData === "string" &&
       tg.initData.length > 0
     );
-
   }
 
 
@@ -1041,7 +1026,6 @@
     } else {
       alert(String(message));
     }
-
   }
 
 
@@ -1055,11 +1039,14 @@
         typeof tg.HapticFeedback.impactOccurred ===
           "function"
       ) {
-        tg.HapticFeedback.impactOccurred("light");
+
+        tg.HapticFeedback.impactOccurred(
+          "light"
+        );
+
       }
 
     } catch (_) {}
-
   }
 
 
@@ -1079,7 +1066,8 @@
               "application/json"
           },
 
-          body: JSON.stringify(body)
+          body:
+            JSON.stringify(body)
         }
       );
 
@@ -1156,40 +1144,49 @@
     ).innerText =
       "Welcome, " +
       firstName;
+    const username =
+      telegramUser.username
+        ? "@" + telegramUser.username
+        : "Telegram User";
 
+    document.getElementById(
+      "welcomeText"
+    ).innerText =
+      "Welcome, " + firstName;
 
     document.getElementById(
       "profileName"
     ).innerText =
       firstName;
 
-
     document.getElementById(
       "profileUsername"
     ).innerText =
       username;
 
+    const initials =
+      firstName
+        .split(" ")
+        .map(x => x[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "US";
 
     document.getElementById(
       "profileAvatar"
     ).innerText =
-      firstName
-        .substring(0, 2)
-        .toUpperCase();
+      initials;
 
+    const referralLink =
+      "https://t.me/" +
+      BOT_USERNAME +
+      "?start=" +
+      telegramUser.id;
 
-    if (telegramUser.id) {
-
-      document.getElementById(
-        "referralLink"
-      ).value =
-        "https://t.me/" +
-        BOT_USERNAME +
-        "?start=ref_" +
-        telegramUser.id;
-
-    }
-
+    document.getElementById(
+      "referralLink"
+    ).value =
+      referralLink;
   }
 
 
@@ -1202,213 +1199,61 @@
     currentBalance =
       Number(balance || 0);
 
-
     document.getElementById(
       "balance"
     ).innerText =
       currentBalance.toLocaleString();
 
-
     const usdt =
       (
-        currentBalance *
-        0.0001
+        currentBalance * 0.0001
       ).toFixed(2);
-
 
     document.getElementById(
       "usdtValue"
     ).innerText =
-      "≈ $" +
-      usdt +
-      " USDT";
-
+      "≈ $" + usdt + " USDT";
 
     document.getElementById(
       "profileBalance"
     ).innerText =
       currentBalance.toLocaleString() +
       " GALAXY";
-
   }
 
 
-  function updateStats() {
+  function updateEarned(value) {
+
+    totalEarned =
+      Number(value || 0);
 
     document.getElementById(
       "totalEarned"
     ).innerText =
-      Number(totalEarned || 0)
-        .toLocaleString();
-
+      totalEarned.toLocaleString();
 
     document.getElementById(
       "profileEarned"
     ).innerText =
-      Number(totalEarned || 0)
-        .toLocaleString() +
+      totalEarned.toLocaleString() +
       " GALAXY";
+  }
 
+
+  function updateReferralCount(value) {
+
+    referralCount =
+      Number(value || 0);
 
     document.getElementById(
       "referralCount"
     ).innerText =
-      Number(referralCount || 0)
-        .toLocaleString();
-
+      referralCount.toLocaleString();
 
     document.getElementById(
       "referralBig"
     ).innerText =
-      Number(referralCount || 0)
-        .toLocaleString();
-
-  }
-
-
-  // ==================================================
-  // CHANNEL UI
-  // ==================================================
-
-  function setChannelStatus(
-    type,
-    joined
-  ) {
-
-    const status =
-      document.getElementById(
-        type + "Status"
-      );
-
-    const icon =
-      document.getElementById(
-        type + "CheckIcon"
-      );
-
-
-    if (joined) {
-
-      status.innerText =
-        "✓ Joined successfully";
-
-      status.className =
-        "verified text-xs mt-1";
-
-      icon.innerText =
-        "✓";
-
-      icon.className =
-        "verified font-bold";
-
-    } else {
-
-      status.innerText =
-        type === "main"
-          ? "Join our main channel"
-          : "Join payment updates channel";
-
-      status.className =
-        "text-gray-400 text-xs mt-1";
-
-      icon.innerText =
-        "○";
-
-      icon.className =
-        "text-gray-400";
-
-    }
-
-  }
-
-
-  function setCheckButtonsDisabled(
-    disabled
-  ) {
-
-    const main =
-      document.getElementById(
-        "mainCheckBtn"
-      );
-
-    const payment =
-      document.getElementById(
-        "paymentCheckBtn"
-      );
-
-
-    main.disabled =
-      disabled;
-
-    payment.disabled =
-      disabled;
-
-
-    if (disabled) {
-
-      main.innerText =
-        "Checking...";
-
-      payment.innerText =
-        "Checking...";
-
-    } else {
-
-      main.innerText =
-        "Check";
-
-      payment.innerText =
-        "Check";
-
-    }
-
-  }
-
-
-  // ==================================================
-  // OPEN CHANNEL
-  // ==================================================
-
-  function openChannel(url) {
-
-    haptic();
-
-    try {
-
-      if (
-        tg &&
-        typeof tg.openTelegramLink ===
-          "function"
-      ) {
-
-        tg.openTelegramLink(url);
-
-        return;
-      }
-
-    } catch (_) {}
-
-
-    try {
-
-      if (
-        tg &&
-        typeof tg.openLink ===
-          "function"
-      ) {
-
-        tg.openLink(url);
-
-        return;
-      }
-
-    } catch (_) {}
-
-
-    window.open(
-      url,
-      "_blank"
-    );
-
+      referralCount.toLocaleString();
   }
 
 
@@ -1418,63 +1263,47 @@
 
   async function checkChannels() {
 
-    if (checkingChannels) {
-      return;
-    }
-
-
-    if (!tg) {
-
-      alertUser(
-        "Telegram WebApp is not available."
-      );
-
-      return;
-    }
-
+    if (checkingChannels) return;
 
     if (!hasInitData()) {
 
-      alertUser(
-        "Telegram session data is missing. Please close the Mini App and open it again from the bot."
-      );
+      document.getElementById(
+        "statusDot"
+      ).innerText =
+        "🔴 Error";
+
+      document.getElementById(
+        "gateMessage"
+      ).innerText =
+        "Telegram session not available. Close and reopen the Mini App from the bot.";
 
       return;
     }
 
+    checkingChannels = true;
 
-    checkingChannels =
-      true;
+    const mainBtn =
+      document.getElementById(
+        "mainCheckBtn"
+      );
 
+    const paymentBtn =
+      document.getElementById(
+        "paymentCheckBtn"
+      );
 
-    setCheckButtonsDisabled(
-      true
-    );
-
+    mainBtn.disabled = true;
+    paymentBtn.disabled = true;
 
     document.getElementById(
       "statusDot"
     ).innerText =
-      "● Checking";
-
-
-    document.getElementById(
-      "statusDot"
-    ).className =
-      "text-yellow-400 text-sm";
-
+      "🟡 Checking";
 
     document.getElementById(
       "gateMessage"
     ).innerText =
-      "Checking your channel membership...";
-
-
-    document.getElementById(
-      "gateMessage"
-    ).className =
-      "text-center text-gray-400 text-sm";
-
+      "Checking channel membership...";
 
     try {
 
@@ -1487,216 +1316,261 @@
           }
         );
 
-
       console.log(
-        "Channel verification response:",
+        "Channel verification:",
         result
       );
 
-
-      if (
-        !result ||
-        result.ok !== true
-      ) {
-
-        throw new Error(
-          result &&
-          result.error
-            ? result.error
-            : "Verification failed"
-        );
-
-      }
-
-
       const mainJoined =
-        !!(
-          result.channels &&
-          result.channels.main
-        );
-
+        result &&
+        result.main &&
+        result.main.joined === true;
 
       const paymentJoined =
-        !!(
-          result.channels &&
-          result.channels.payment
+        result &&
+        result.payments &&
+        result.payments.joined === true;
+
+      const allJoined =
+        result &&
+        result.joined === true &&
+        mainJoined &&
+        paymentJoined;
+
+
+      // MAIN CHANNEL
+
+      const mainStatus =
+        document.getElementById(
+          "mainStatus"
         );
 
-
-      setChannelStatus(
-        "main",
-        mainJoined
-      );
-
-
-      setChannelStatus(
-        "payment",
-        paymentJoined
-      );
-
-
-      channelsVerified =
-        !!(
-          result.channels &&
-          result.channels.joined
+      const mainIcon =
+        document.getElementById(
+          "mainCheckIcon"
         );
 
+      if (mainJoined) {
 
-      if (channelsVerified) {
+        mainStatus.innerText =
+          "✓ Joined";
 
-        document.getElementById(
-          "statusDot"
-        ).innerText =
-          "● Verified";
+        mainStatus.className =
+          "verified text-xs mt-1";
 
-        document.getElementById(
-          "statusDot"
-        ).className =
-          "verified text-sm";
+        mainIcon.innerText =
+          "✓";
 
-
-        document.getElementById(
-          "gateMessage"
-        ).innerText =
-          "✓ Both channels verified. Opening Galaxy...";
-
-        document.getElementById(
-          "gateMessage"
-        ).className =
-          "success-text text-center";
-
-
-        haptic();
-
-
-        await syncUser();
-
-
-        setTimeout(
-          () => {
-            unlockApp();
-          },
-          400
-        );
-
+        mainIcon.className =
+          "verified";
 
       } else {
 
+        mainStatus.innerText =
+          result.main.status ||
+          "Not joined";
+
+        mainStatus.className =
+          "text-red-400 text-xs mt-1";
+
+        mainIcon.innerText =
+          "○";
+
+        mainIcon.className =
+          "text-red-400";
+      }
+
+
+      // PAYMENT CHANNEL
+
+      const paymentStatus =
+        document.getElementById(
+          "paymentStatus"
+        );
+
+      const paymentIcon =
+        document.getElementById(
+          "paymentCheckIcon"
+        );
+
+      if (paymentJoined) {
+
+        paymentStatus.innerText =
+          "✓ Joined";
+
+        paymentStatus.className =
+          "verified text-xs mt-1";
+
+        paymentIcon.innerText =
+          "✓";
+
+        paymentIcon.className =
+          "verified";
+
+      } else {
+
+        paymentStatus.innerText =
+          result.payments.status ||
+          "Not joined";
+
+        paymentStatus.className =
+          "text-red-400 text-xs mt-1";
+
+        paymentIcon.innerText =
+          "○";
+
+        paymentIcon.className =
+          "text-red-400";
+      }
+
+
+      // BOTH VERIFIED
+
+      if (allJoined) {
+
+        channelsVerified = true;
+
         document.getElementById(
           "statusDot"
         ).innerText =
-          "● Join required";
-
-        document.getElementById(
-          "statusDot"
-        ).className =
-          "text-yellow-400 text-sm";
-
-
-        let missing = [];
-
-
-        if (!mainJoined) {
-          missing.push(
-            "USDT Galaxy Official"
-          );
-        }
-
-
-        if (!paymentJoined) {
-          missing.push(
-            "USDT Galaxy Payments"
-          );
-        }
-
+          "🟢 Verified";
 
         document.getElementById(
           "gateMessage"
         ).innerText =
-          "Please join: " +
-          missing.join(", ") +
-          " and tap Check again.";
-
+          "✓ Both channels verified successfully.";
 
         document.getElementById(
           "gateMessage"
         ).className =
-          "error-text text-center";
+          "text-center success-text";
 
+        document.getElementById(
+          "continueBtn"
+        ).style.display =
+          "block";
+
+        haptic();
+
+      } else {
+
+        channelsVerified = false;
+
+        document.getElementById(
+          "statusDot"
+        ).innerText =
+          "🟡 Join required";
+
+        document.getElementById(
+          "gateMessage"
+        ).innerText =
+          "Please join both channels and tap Check again.";
+
+        document.getElementById(
+          "gateMessage"
+        ).className =
+          "text-center error-text";
       }
 
     } catch (error) {
 
       console.error(
-        "Channel verification error:",
+        "Channel verification failed:",
         error
       );
 
+      channelsVerified = false;
 
       document.getElementById(
         "statusDot"
       ).innerText =
-        "● Error";
-
-      document.getElementById(
-        "statusDot"
-      ).className =
-        "text-red-400 text-sm";
-
-
-      let message =
-        error &&
-        error.message
-          ? error.message
-          : "Channel verification failed.";
-
-
-      if (
-        error &&
-        error.status === 401
-      ) {
-
-        message =
-          "Telegram session expired. Close the Mini App and open it again from the bot.";
-
-      } else if (
-        error &&
-        error.status === 403
-      ) {
-
-        message =
-          "Telegram verification was rejected. Please reopen the Mini App from the bot.";
-
-      }
-
+        "🔴 Error";
 
       document.getElementById(
         "gateMessage"
       ).innerText =
-        message;
-
+        "Verification failed. Please try again.";
 
       document.getElementById(
         "gateMessage"
       ).className =
-        "error-text text-center";
-
-
-      alertUser(
-        message
-      );
-
-    } finally {
-
-      checkingChannels =
-        false;
-
-      setCheckButtonsDisabled(
-        false
-      );
-
+        "text-center error-text";
     }
 
+    mainBtn.disabled = false;
+    paymentBtn.disabled = false;
+
+    checkingChannels = false;
+  }
+
+
+  // ==================================================
+  // OPEN CHANNEL
+  // ==================================================
+
+  function openChannel(url) {
+
+    try {
+
+      if (
+        tg &&
+        typeof tg.openTelegramLink ===
+          "function"
+      ) {
+
+        tg.openTelegramLink(url);
+
+      } else {
+
+        window.open(
+          url,
+          "_blank"
+        );
+      }
+
+    } catch (_) {
+
+      window.open(
+        url,
+        "_blank"
+      );
+    }
+  }
+
+
+  // ==================================================
+  // UNLOCK APP
+  // ==================================================
+
+  async function unlockApp() {
+
+    if (!channelsVerified) {
+
+      alertUser(
+        "Please verify both channels first."
+      );
+
+      return;
+    }
+
+    document.getElementById(
+      "gatePage"
+    ).style.display =
+      "none";
+
+    document.getElementById(
+      "mainApp"
+    ).style.display =
+      "block";
+
+    document.getElementById(
+      "bottomNav"
+    ).style.display =
+      "block";
+
+    showPage("home");
+
+    await syncUser();
   }
 
 
@@ -1706,10 +1580,7 @@
 
   async function syncUser() {
 
-    if (!hasInitData()) {
-      return false;
-    }
-
+    if (!hasInitData()) return;
 
     try {
 
@@ -1722,110 +1593,23 @@
           }
         );
 
-
-      console.log(
-        "Sync response:",
-        result
-      );
-
-
       if (
         result &&
-        result.ok &&
-        result.user
+        result.success
       ) {
 
         updateBalance(
-          result.user.balance
+          result.balance
         );
-
-
-        totalEarned =
-          Number(
-            result.user.total_earned ||
-            0
-          );
-
-
-        referralCount =
-          Number(
-            result.user.referral_count ||
-            0
-          );
-
-
-        updateStats();
-
-        return true;
       }
-
-
-      return false;
 
     } catch (error) {
 
       console.error(
-        "Sync error:",
+        "Sync failed:",
         error
       );
-
-      return false;
-
     }
-
-  }
-
-
-  // ==================================================
-  // UNLOCK APP
-  // ==================================================
-
-  function unlockApp() {
-
-    if (!channelsVerified) {
-
-      alertUser(
-        "Please join and verify both channels first."
-      );
-
-      return;
-    }
-
-
-    document.getElementById(
-      "gatePage"
-    ).style.display =
-      "none";
-
-
-    document.getElementById(
-      "mainApp"
-    ).style.display =
-      "block";
-
-
-    document.getElementById(
-      "bottomNav"
-    ).style.display =
-      "block";
-
-
-    document.getElementById(
-      "statusDot"
-    ).innerText =
-      "● Verified";
-
-
-    document.getElementById(
-      "statusDot"
-    ).className =
-      "verified text-sm";
-
-
-    showPage(
-      "home"
-    );
-
   }
 
 
@@ -1835,23 +1619,12 @@
 
   function showPage(page) {
 
-    if (!channelsVerified) {
-
-      alertUser(
-        "Please verify both channels first."
-      );
-
-      return;
-    }
-
-
     const pages = [
       "home",
       "tasks",
       "referral",
       "profile"
     ];
-
 
     pages.forEach(
       name => {
@@ -1867,64 +1640,41 @@
             "active",
             name === page
           );
-
         }
-
       }
     );
 
 
-    const navButtons = {
-      home:
-        "navHome",
+    const navs = [
+      "Home",
+      "Tasks",
+      "Referral",
+      "Profile"
+    ];
 
-      tasks:
-        "navTasks",
+    navs.forEach(
+      name => {
 
-      referral:
-        "navReferral",
+        const element =
+          document.getElementById(
+            "nav" + name
+          );
 
-      profile:
-        "navProfile"
-    };
+        if (element) {
 
-
-    Object.values(
-      navButtons
-    ).forEach(
-      id => {
-
-        const button =
-          document.getElementById(id);
-
-        if (button) {
-          button.classList.remove(
-            "active"
+          element.classList.toggle(
+            "active",
+            name.toLowerCase() ===
+              page
           );
         }
-
       }
     );
 
-
-    if (
-      navButtons[page]
-    ) {
-
-      document.getElementById(
-        navButtons[page]
-      ).classList.add(
-        "active"
-      );
-
-    }
-
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-
+    window.scrollTo(
+      0,
+      0
+    );
   }
 
 
@@ -1947,37 +1697,22 @@
       return;
     }
 
-
     if (!hasInitData()) {
 
       alertUser(
-        "Telegram session is missing. Please reopen the Mini App."
+        "Telegram session unavailable."
       );
 
       return;
     }
 
+    button.disabled = true;
 
-    if (
-      button.dataset.processing ===
-      "1"
-    ) {
-      return;
-    }
-
-
-    button.dataset.processing =
-      "1";
-
-    button.disabled =
-      true;
+    const originalText =
+      button.innerText;
 
     button.innerText =
-      "Opening video...";
-
-
-    haptic();
-
+      "⏳ Opening...";
 
     try {
 
@@ -1995,9 +1730,7 @@
           url,
           "_blank"
         );
-
       }
-
 
       await new Promise(
         resolve =>
@@ -2007,10 +1740,8 @@
           )
       );
 
-
       button.innerText =
-        "Claiming...";
-
+        "⏳ Claiming...";
 
       const result =
         await apiPost(
@@ -2020,104 +1751,104 @@
               tg.initData,
 
             taskId:
-              taskId,
-
-            amount:
-              100
+              taskId
           }
         );
 
-
       if (
         result &&
-        result.ok
+        result.success
       ) {
 
         updateBalance(
           result.balance
         );
 
-
-        totalEarned +=
-          100;
-
-
-        updateStats();
-
+        updateEarned(
+          totalEarned +
+          Number(
+            result.earned || 0
+          )
+        );
 
         button.innerText =
-          "✓ Earned 100 GALAXY";
+          "✅ Earned +100";
 
-        button.classList.remove(
-          "bg-blue-600"
-        );
-
-        button.classList.add(
-          "bg-green-600"
-        );
-
+        haptic();
 
         alertUser(
-          "🎉 You earned 100 GALAXY!"
+          "🎉 +100 GALAXY added!"
         );
 
+      } else {
 
-        return;
+        throw new Error(
+          "Earn failed"
+        );
       }
-
-
-      throw new Error(
-        "Reward could not be claimed."
-      );
 
     } catch (error) {
 
       console.error(
-        "Earn error:",
+        "Watch & Earn error:",
         error
       );
 
-
       if (
-        error &&
         error.status === 409
       ) {
 
         button.innerText =
-          "✓ Already Earned";
+          "✅ Already Earned";
 
-        button.classList.add(
-          "bg-green-600"
+        alertUser(
+          "You already claimed this task."
         );
 
-        return;
+      } else if (
+        error.status === 403
+      ) {
+
+        button.innerText =
+          originalText;
+
+        alertUser(
+          "Please make sure you are still joined in both channels."
+        );
+
+      } else {
+
+        button.innerText =
+          originalText;
+
+        alertUser(
+          "Unable to claim reward right now."
+        );
       }
 
+    } finally {
 
-      button.disabled =
-        false;
+      setTimeout(
+        () => {
 
-      button.dataset.processing =
-        "0";
+          if (
+            button.innerText !==
+            "✅ Already Earned"
+          ) {
 
-      button.innerText =
-        "▶️ Watch & Earn";
+            button.disabled =
+              false;
+          }
 
-
-      alertUser(
-        error &&
-        error.message
-          ? error.message
-          : "Unable to claim reward."
+        },
+        1000
       );
-
     }
-
   }
 
 
   // ==================================================
-  // REFERRAL COPY
+  // COPY REFERRAL
   // ==================================================
 
   async function copyReferral() {
@@ -2126,17 +1857,6 @@
       document.getElementById(
         "referralLink"
       );
-
-
-    if (!input.value) {
-
-      alertUser(
-        "Referral link is not available yet."
-      );
-
-      return;
-    }
-
 
     try {
 
@@ -2159,9 +1879,7 @@
       alertUser(
         "Referral link copied!"
       );
-
     }
-
   }
 
 
@@ -2171,25 +1889,23 @@
 
   function shareReferral() {
 
-    const link =
-      document.getElementById(
-        "referralLink"
-      ).value;
-
-
-    if (!link) {
+    if (!telegramUser) {
 
       alertUser(
-        "Referral link is not available yet."
+        "Telegram user not available."
       );
 
       return;
     }
 
+    const link =
+      "https://t.me/" +
+      BOT_USERNAME +
+      "?start=" +
+      telegramUser.id;
 
     const shareText =
-      "🚀 Join me on USDT Galaxy and start earning GALAXY!";
-
+      "🚀 Join USDT Galaxy and start earning GALAXY!";
 
     const shareUrl =
       "https://t.me/share/url?url=" +
@@ -2199,30 +1915,23 @@
         shareText
       );
 
+    if (
+      tg &&
+      typeof tg.openTelegramLink ===
+        "function"
+    ) {
 
-    try {
+      tg.openTelegramLink(
+        shareUrl
+      );
 
-      if (
-        tg &&
-        typeof tg.openTelegramLink ===
-          "function"
-      ) {
+    } else {
 
-        tg.openTelegramLink(
-          shareUrl
-        );
-
-        return;
-      }
-
-    } catch (_) {}
-
-
-    window.open(
-      shareUrl,
-      "_blank"
-    );
-
+      window.open(
+        shareUrl,
+        "_blank"
+      );
+    }
   }
 
 
@@ -2232,48 +1941,20 @@
 
   async function requestPayout() {
 
-    if (!channelsVerified) {
-
-      alertUser(
-        "Please verify both channels first."
-      );
-
-      return;
-    }
-
-
-    const amountInput =
-      document.getElementById(
-        "payoutAmount"
-      );
-
-
-    const walletInput =
-      document.getElementById(
-        "walletAddress"
-      );
-
-
-    const button =
-      document.getElementById(
-        "payoutBtn"
-      );
-
-
     const amount =
       Number(
-        amountInput.value
+        document.getElementById(
+          "payoutAmount"
+        ).value
       );
 
-
     const wallet =
-      String(
-        walletInput.value || ""
-      ).trim();
-
+      document.getElementById(
+        "walletAddress"
+      ).value.trim();
 
     if (
-      !Number.isInteger(amount) ||
+      !amount ||
       amount < 1000
     ) {
 
@@ -2284,19 +1965,25 @@
       return;
     }
 
-
-    if (
-      wallet.length < 20 ||
-      wallet.length > 120
-    ) {
+    if (!wallet) {
 
       alertUser(
-        "Please enter a valid USDT wallet address."
+        "Please enter your USDT wallet address."
       );
 
       return;
     }
 
+    if (
+      wallet.length < 20
+    ) {
+
+      alertUser(
+        "Please enter a valid wallet address."
+      );
+
+      return;
+    }
 
     if (
       amount >
@@ -2310,108 +1997,9 @@
       return;
     }
 
-
-    button.disabled =
-      true;
-
-    button.innerText =
-      "Submitting...";
-
-
-    try {
-
-      const result =
-        await apiPost(
-          "/payout",
-          {
-            initData:
-              tg.initData,
-
-            amount:
-              amount,
-
-            walletAddress:
-              wallet
-          }
-        );
-
-
-      if (
-        result &&
-        result.ok
-      ) {
-
-        currentBalance -=
-          amount;
-
-
-        updateBalance(
-          currentBalance
-        );
-
-
-        amountInput.value =
-          "";
-
-        walletInput.value =
-          "";
-
-
-        alertUser(
-          "✅ Withdrawal request submitted. Payment will be processed manually."
-        );
-
-
-      } else {
-
-        throw new Error(
-          result &&
-          result.error
-            ? result.error
-            : "Payout failed."
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Payout error:",
-        error
-      );
-
-
-      if (
-        error &&
-        error.message ===
-          "INSUFFICIENT_BALANCE"
-      ) {
-
-        alertUser(
-          "Insufficient GALAXY balance."
-        );
-
-      } else {
-
-        alertUser(
-          error &&
-          error.message
-            ? error.message
-            : "Unable to submit payout."
-        );
-
-      }
-
-    } finally {
-
-      button.disabled =
-        false;
-
-      button.innerText =
-        "💰 Request Payout";
-
-    }
-
+    alertUser(
+      "Payout system is currently being connected to the backend."
+    );
   }
 
 
@@ -2421,94 +2009,65 @@
 
   function redeemCode() {
 
-    alertUser(
-      "Redeem system will be activated after reward codes are configured."
-    );
+    const code =
+      document.getElementById(
+        "redeemInput"
+      ).value.trim();
 
+    if (!code) {
+
+      alertUser(
+        "Please enter a redeem code."
+      );
+
+      return;
+    }
+
+    alertUser(
+      "Redeem system is coming soon."
+    );
   }
 
 
   // ==================================================
-  // INITIAL LOAD
+  // INITIALIZE
   // ==================================================
 
   async function init() {
 
     updateUserUI();
 
-
     if (!tg) {
 
       document.getElementById(
         "statusDot"
       ).innerText =
-        "● Telegram Required";
-
-      document.getElementById(
-        "statusDot"
-      ).className =
-        "text-red-400 text-sm";
-
+        "🔴 Telegram only";
 
       document.getElementById(
         "gateMessage"
       ).innerText =
-        "Please open this app inside Telegram.";
-
+        "Please open this Mini App from Telegram.";
 
       return;
     }
-
-
-    if (!telegramUser) {
-
-      document.getElementById(
-        "statusDot"
-      ).innerText =
-        "● User Missing";
-
-      document.getElementById(
-        "statusDot"
-      ).className =
-        "text-red-400 text-sm";
-
-    }
-
 
     if (!hasInitData()) {
 
       document.getElementById(
         "statusDot"
       ).innerText =
-        "● Session Missing";
-
-      document.getElementById(
-        "statusDot"
-      ).className =
-        "text-red-400 text-sm";
-
+        "🔴 Error";
 
       document.getElementById(
         "gateMessage"
       ).innerText =
-        "Telegram session data is missing. Close this Mini App and open it again from @USDTGalaxyProRobot.";
-
-
-      document.getElementById(
-        "gateMessage"
-      ).className =
-        "error-text text-center";
-
+        "Telegram session not available. Open the Mini App from @USDTGalaxyProRobot.";
 
       return;
     }
 
-
-    // Automatically check channels
-    // when the Mini App opens.
-
     await checkChannels();
-
   }
 
 
@@ -2522,3 +2081,5 @@
 
 </body>
 </html>
+
+  
