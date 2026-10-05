@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+  >
 
   <title>USDT Galaxy</title>
 
+  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,6 +30,7 @@
         rgba(20, 25, 40, 0.95),
         rgba(8, 11, 20, 0.95)
       );
+
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
     }
@@ -40,6 +42,7 @@
       font-weight: bold;
       background: #2563eb;
       margin-top: 10px;
+      color: white;
     }
 
     .earn-btn:disabled {
@@ -52,17 +55,27 @@
 
   <div class="max-w-md mx-auto p-4">
 
+    <!-- HEADER -->
+
     <div class="flex justify-between items-center mb-5">
+
       <div>
-        <h1 class="text-2xl font-bold">🌌 USDT Galaxy</h1>
+        <h1 class="text-2xl font-bold">
+          🌌 USDT Galaxy
+        </h1>
+
         <p class="text-gray-400 text-sm">
           Watch & Earn
         </p>
       </div>
 
-      <div id="statusDot" class="text-green-400 text-sm">
+      <div
+        id="statusDot"
+        class="text-green-400 text-sm"
+      >
         ● Online
       </div>
+
     </div>
 
 
@@ -95,7 +108,7 @@
     </div>
 
 
-    <!-- TASKS -->
+    <!-- WATCH & EARN -->
 
     <div class="card p-5">
 
@@ -203,27 +216,49 @@
 
 <script>
 
-  // ==================================
-  // CONFIG
-  // ==================================
+  // ==========================================
+  // RAILWAY BACKEND
+  // ==========================================
 
   const API =
     "https://usdtbot-production-89e9.up.railway.app";
 
 
-  // ==================================
-  // TELEGRAM
-  // ==================================
+  // ==========================================
+  // TELEGRAM MINI APP
+  // ==========================================
 
   const tg = window.Telegram.WebApp;
+
+
+  // ==========================================
+  // DEBUG POPUP
+  // ==========================================
+
+  alert(
+    "TG version: " +
+      (tg.version || "NONE") +
+
+    "\nPlatform: " +
+      (tg.platform || "NONE") +
+
+    "\ninitData length: " +
+      (tg.initData ? tg.initData.length : 0) +
+
+    "\nUser ID: " +
+      (tg.initDataUnsafe?.user?.id || "NONE")
+  );
+
+
+  // Telegram Mini App initialize
 
   tg.ready();
   tg.expand();
 
 
-  // ==================================
+  // ==========================================
   // ELEMENTS
-  // ==================================
+  // ==========================================
 
   const balanceElement =
     document.getElementById("balance");
@@ -235,14 +270,20 @@
     document.getElementById("debug");
 
 
-  // ==================================
-  // DEBUG INFO
-  // ==================================
+  // ==========================================
+  // DEBUG MESSAGE
+  // ==========================================
 
   function showDebug(message) {
+
     debugElement.innerText = message;
+
   }
 
+
+  // ==========================================
+  // TELEGRAM SESSION CHECK
+  // ==========================================
 
   function telegramSessionAvailable() {
 
@@ -255,13 +296,14 @@
   }
 
 
-  // ==================================
-  // UPDATE BALANCE UI
-  // ==================================
+  // ==========================================
+  // UPDATE BALANCE
+  // ==========================================
 
   function updateBalance(balance) {
 
-    const amount = Number(balance || 0);
+    const amount =
+      Number(balance || 0);
 
     balanceElement.innerText =
       amount.toLocaleString();
@@ -275,9 +317,9 @@
   }
 
 
-  // ==================================
+  // ==========================================
   // LOAD BALANCE
-  // ==================================
+  // ==========================================
 
   async function loadBalance() {
 
@@ -290,7 +332,7 @@
         "Open this Mini App from the Telegram bot.";
 
       showDebug(
-        "Telegram session missing. Open the app using the 🎬 Watch & Earn button inside @USDTGalaxyProRobot."
+        "Telegram initData is missing."
       );
 
       return;
@@ -306,19 +348,20 @@
     try {
 
       const response =
-        await fetch(API + "/sync", {
+        await fetch(
+          API + "/sync",
+          {
+            method: "POST",
 
-          method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
 
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            initData: tg.initData
-          })
-
-        });
+            body: JSON.stringify({
+              initData: tg.initData
+            })
+          }
+        );
 
 
       const data =
@@ -357,7 +400,9 @@
       }
 
 
-      updateBalance(data.balance);
+      updateBalance(
+        data.balance
+      );
 
 
       showDebug(
@@ -380,15 +425,18 @@
   }
 
 
-  // ==================================
-  // WATCH YOUTUBE + EARN
-  // ==================================
+  // ==========================================
+  // WATCH VIDEO + EARN
+  // ==========================================
 
   async function watchYouTube(
     videoUrl,
     taskId,
     button
   ) {
+
+
+    // Check Telegram session
 
     if (!telegramSessionAvailable()) {
 
@@ -409,57 +457,76 @@
 
     try {
 
-      /*
-       * First request reward from server.
-       *
-       * IMPORTANT:
-       * The frontend does NOT send balance
-       * or reward amount.
-       */
+
+      // ======================================
+      // SEND EARN REQUEST
+      // ======================================
 
       const response =
-        await fetch(API + "/earn", {
+        await fetch(
+          API + "/earn",
+          {
+            method: "POST",
 
-          method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+            body: JSON.stringify({
 
-          body: JSON.stringify({
+              initData:
+                tg.initData,
 
-            initData: tg.initData,
+              taskId:
+                taskId
 
-            taskId: taskId
-
-          })
-
-        });
+            })
+          }
+        );
 
 
       const data =
         await response.json();
 
 
-      if (!response.ok || !data.success) {
+      // ======================================
+      // CHECK RESPONSE
+      // ======================================
+
+      if (
+        !response.ok ||
+        !data.success
+      ) {
 
         throw new Error(
-          data.error || "Reward failed"
+          data.error ||
+          "Reward failed"
         );
 
       }
 
 
-      // Update balance from server
+      // ======================================
+      // UPDATE BALANCE
+      // ======================================
 
-      updateBalance(data.balance);
+      updateBalance(
+        data.balance
+      );
 
 
-      // Open YouTube
+      // ======================================
+      // OPEN YOUTUBE
+      // ======================================
 
-      if (tg.openLink) {
+      if (
+        tg &&
+        typeof tg.openLink === "function"
+      ) {
 
-        tg.openLink(videoUrl);
+        tg.openLink(
+          videoUrl
+        );
 
       } else {
 
@@ -470,6 +537,10 @@
 
       }
 
+
+      // ======================================
+      // SUCCESS
+      // ======================================
 
       button.innerText =
         "✅ Earned +100 GALAXY";
@@ -491,13 +562,21 @@
         "▶️ Watch Video & Earn";
 
 
-      tg.showAlert(
-        "Reward failed. Please try again."
-      );
+      if (
+        tg &&
+        typeof tg.showAlert === "function"
+      ) {
+
+        tg.showAlert(
+          "Reward failed. Please try again."
+        );
+
+      }
 
 
       showDebug(
-        "Earn error: " + error.message
+        "Earn error: " +
+        error.message
       );
 
     }
@@ -505,9 +584,9 @@
   }
 
 
-  // ==================================
-  // START
-  // ==================================
+  // ==========================================
+  // START APP
+  // ==========================================
 
   loadBalance();
 
