@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>USDT Galaxy - Earn Studio</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -33,7 +36,8 @@
         </div>
 
 
-        <!-- VIDEO 1 -->
+        <!-- ================= VIDEO 1 ================= -->
+
         <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30 mb-3">
 
             <div class="text-left">
@@ -47,7 +51,11 @@
             </div>
 
             <button
-                onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_1', 'video1', this)"
+                onclick="watchYouTube(
+                    'https://youtu.be/unTAEBvggus',
+                    'video1',
+                    this
+                )"
                 class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
             >
                 WATCH
@@ -56,7 +64,8 @@
         </div>
 
 
-        <!-- VIDEO 2 -->
+        <!-- ================= VIDEO 2 ================= -->
+
         <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30 mb-3">
 
             <div class="text-left">
@@ -70,7 +79,11 @@
             </div>
 
             <button
-                onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_2', 'video2', this)"
+                onclick="watchYouTube(
+                    'https://youtu.be/Hja_iwEkfmI',
+                    'video2',
+                    this
+                )"
                 class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
             >
                 WATCH
@@ -79,7 +92,8 @@
         </div>
 
 
-        <!-- VIDEO 3 -->
+        <!-- ================= VIDEO 3 ================= -->
+
         <div class="bg-[#241c4a] p-3 rounded-xl flex justify-between items-center border border-purple-800/30">
 
             <div class="text-left">
@@ -93,7 +107,11 @@
             </div>
 
             <button
-                onclick="watchYouTube('https://youtu.be/YOUR_VIDEO_ID_3', 'video3', this)"
+                onclick="watchYouTube(
+                    'https://youtu.be/I5mLBbsuAdA',
+                    'video3',
+                    this
+                )"
                 class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold transition"
             >
                 WATCH
@@ -106,123 +124,141 @@
 
 <script>
 
-const API =
-    'https://usdtbot-production-89e9.up.railway.app';
+/* =====================================================
+   RAILWAY BACKEND
+===================================================== */
 
-const tg = window.Telegram.WebApp;
+const API =
+    "https://usdtbot-production-89e9.up.railway.app";
+
+
+/* =====================================================
+   TELEGRAM MINI APP
+===================================================== */
+
+const tg =
+    window.Telegram.WebApp;
 
 tg.ready();
 tg.expand();
 
 
-/* ============================
-   TELEGRAM USER
-============================ */
-
-const telegramUser =
-    tg.initDataUnsafe?.user;
-
-const userId =
-    telegramUser?.id;
-
-
-/*
- * IMPORTANT:
- * Balance localStorage se nahi aayega.
- * Database is the source of truth.
- */
-
-
-/* ============================
-   CURRENT BALANCE
-============================ */
+/* =====================================================
+   BALANCE
+===================================================== */
 
 let currentBalance = 0;
 
 
-/* ============================
+/* =====================================================
    UPDATE UI
-============================ */
+===================================================== */
 
 function updateUI() {
 
     document.getElementById(
-        'balanceDisplay'
-    ).innerText = currentBalance;
+        "balanceDisplay"
+    ).innerText =
+        currentBalance + " GALAXY";
 
     document.getElementById(
-        'usdtDisplay'
+        "usdtDisplay"
     ).innerText =
         (currentBalance * 0.0001).toFixed(2);
 }
 
 
-/* ============================
+/* =====================================================
    LOAD BALANCE FROM RAILWAY
-============================ */
+===================================================== */
 
 async function loadBalance() {
 
+    console.log(
+        "Telegram initData:",
+        tg.initData
+    );
+
+
+    if (!tg.initData) {
+
+        document.getElementById(
+            "balanceDisplay"
+        ).innerText =
+            "Open in Telegram";
+
+        return;
+    }
+
+
     try {
 
-        /*
-         * Telegram Mini App must provide
-         * authenticated initData.
-         */
+        const response =
+            await fetch(
+                API + "/sync",
+                {
+                    method: "POST",
 
-        if (!tg.initData) {
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            document.getElementById(
-                'balanceDisplay'
-            ).innerText = 'Open in Telegram';
+                    body: JSON.stringify({
 
-            console.error(
-                'Telegram initData is missing.'
+                        initData:
+                            tg.initData
+
+                    })
+                }
             );
 
-            return;
+
+        const responseText =
+            await response.text();
+
+
+        console.log(
+            "SYNC status:",
+            response.status
+        );
+
+        console.log(
+            "SYNC response:",
+            responseText
+        );
+
+
+        let data;
+
+        try {
+
+            data =
+                JSON.parse(responseText);
+
+        } catch {
+
+            throw new Error(
+                "Backend returned invalid response: " +
+                responseText
+            );
         }
 
 
-        const response =
-            await fetch(`${API}/sync`, {
-
-                method: 'POST',
-
-                headers: {
-                    'Content-Type':
-                        'application/json'
-                },
-
-                body: JSON.stringify({
-
-                    initData:
-                        tg.initData
-
-                })
-
-            });
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok ||
-            !data.success) {
+        if (
+            !response.ok ||
+            !data.success
+        ) {
 
             throw new Error(
                 data.error ||
-                'Unable to load balance'
+                "Unable to load balance"
             );
         }
 
 
         /*
-         * SUPABASE BALANCE
-         *
-         * This is now the ONLY balance
-         * displayed by the Mini App.
+         * Database balance only.
          */
 
         currentBalance =
@@ -232,28 +268,36 @@ async function loadBalance() {
 
 
         console.log(
-            '✅ Balance loaded:',
+            "✅ Balance loaded:",
             currentBalance
         );
+
 
     } catch (error) {
 
         console.error(
-            '❌ Balance loading error:',
+            "❌ Balance loading error:",
             error
         );
 
-        document.getElementById(
-            'balanceDisplay'
-        ).innerText = 'Error';
 
+        document.getElementById(
+            "balanceDisplay"
+        ).innerText =
+            "ERROR";
+
+
+        alert(
+            "Balance error:\n\n" +
+            error.message
+        );
     }
 }
 
 
-/* ============================
-   WATCH & EARN
-============================ */
+/* =====================================================
+   WATCH + EARN
+===================================================== */
 
 async function watchYouTube(
     videoUrl,
@@ -262,95 +306,131 @@ async function watchYouTube(
 ) {
 
     /*
-     * Open YouTube video
-     */
-
-    window.open(
-        videoUrl,
-        '_blank'
-    );
-
-
-    /*
-     * Prevent multiple clicks
+     * Prevent double click.
      */
 
     if (button.disabled) {
         return;
     }
 
+
+    /*
+     * Telegram check.
+     */
+
+    if (!tg.initData) {
+
+        alert(
+            "Telegram session missing.\n\n" +
+            "Please open this Mini App from Telegram."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Disable button.
+     */
+
     button.disabled = true;
+
 
     const originalText =
         button.innerText;
 
+
     button.innerText =
-        'EARNING...';
+        "EARNING...";
 
 
     try {
 
-        if (!tg.initData) {
-
-            throw new Error(
-                'Telegram session missing'
-            );
-        }
+        console.log(
+            "Starting task:",
+            taskId
+        );
 
 
         /*
-         * IMPORTANT:
+         * Send ONLY:
          *
-         * We DO NOT send:
+         * initData
+         * taskId
          *
-         * balance: 3500
-         *
-         * Frontend cannot choose
-         * the balance anymore.
-         *
-         * We only send taskId.
+         * Server decides reward.
          */
 
         const response =
-            await fetch(`${API}/earn`, {
+            await fetch(
+                API + "/earn",
+                {
+                    method: "POST",
 
-                method: 'POST',
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                headers: {
-                    'Content-Type':
-                        'application/json'
-                },
+                    body: JSON.stringify({
 
-                body: JSON.stringify({
+                        initData:
+                            tg.initData,
 
-                    initData:
-                        tg.initData,
+                        taskId:
+                            taskId
 
-                    taskId:
-                        taskId
-
-                })
-
-            });
-
-
-        const data =
-            await response.json();
+                    })
+                }
+            );
 
 
-        if (!response.ok ||
-            !data.success) {
+        const responseText =
+            await response.text();
+
+
+        console.log(
+            "EARN status:",
+            response.status
+        );
+
+        console.log(
+            "EARN response:",
+            responseText
+        );
+
+
+        let data;
+
+        try {
+
+            data =
+                JSON.parse(responseText);
+
+        } catch {
+
+            throw new Error(
+                "Backend response:\n" +
+                responseText
+            );
+        }
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
 
             throw new Error(
                 data.error ||
-                'Reward failed'
+                "Unable to add reward"
             );
         }
 
 
         /*
-         * Railway/Supabase returns
-         * the new real balance.
+         * New balance returned
+         * by Railway/Supabase.
          */
 
         currentBalance =
@@ -360,23 +440,54 @@ async function watchYouTube(
 
 
         console.log(
-            '✅ Reward:',
-            data.earned,
-            'New balance:',
+            "✅ Reward added:",
+            data.reward
+        );
+
+        console.log(
+            "✅ New balance:",
             currentBalance
+        );
+
+
+        /*
+         * Open YouTube after
+         * successful reward.
+         */
+
+        window.open(
+            videoUrl,
+            "_blank"
+        );
+
+
+        /*
+         * Confirmation.
+         */
+
+        alert(
+            "+" +
+            data.reward +
+            " GALAXY added!\n\n" +
+            "New balance: " +
+            currentBalance +
+            " GALAXY"
         );
 
 
     } catch (error) {
 
         console.error(
-            '❌ Earn error:',
+            "❌ Earn error:",
             error
         );
 
+
         alert(
-            'Unable to add reward. Please try again.'
+            "Unable to add reward.\n\n" +
+            error.message
         );
+
 
     } finally {
 
@@ -388,9 +499,9 @@ async function watchYouTube(
 }
 
 
-/* ============================
+/* =====================================================
    INITIAL LOAD
-============================ */
+===================================================== */
 
 loadBalance();
 
