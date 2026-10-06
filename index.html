@@ -10,7 +10,6 @@
 
   <title>Galaxy Token</title>
 
-  <!-- Telegram official Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
 
   <style>
@@ -243,6 +242,7 @@
       font-size: 13px;
       color: #facc15;
       text-align: center;
+      line-height: 1.5;
     }
 
     .reward {
@@ -285,8 +285,6 @@
 
       </div>
 
-      <!-- MAIN CHANNEL -->
-
       <div class="channel">
 
         <div class="channel-icon">
@@ -316,8 +314,6 @@
       >
         📢 Join Main Channel
       </button>
-
-      <!-- PAYMENT CHANNEL -->
 
       <div class="channel">
 
@@ -784,8 +780,6 @@
       </div>
 
 
-      <!-- PAYOUT -->
-
       <div class="card">
 
         <div style="font-size:19px;font-weight:bold;">
@@ -829,8 +823,6 @@
 
       </div>
 
-
-      <!-- PAYOUT HISTORY -->
 
       <div class="card">
 
@@ -916,6 +908,7 @@ let verified = false;
 let checking = false;
 let minimumWithdrawal = 500;
 let referralReward = 100;
+
 let taskData = {};
 let timerIntervals = {};
 
@@ -1194,13 +1187,16 @@ async function api(
 
     const error =
       new Error(
-        result.error ||
         result.message ||
+        result.error ||
         "Request failed"
       );
 
     error.data =
       result;
+
+    error.status =
+      response.status;
 
     throw error;
   }
@@ -1285,12 +1281,10 @@ async function checkChannels() {
     );
 
     const mainJoined =
-      result &&
-      result.mainJoined === true;
+      result?.main?.joined === true;
 
     const paymentJoined =
-      result &&
-      result.paymentJoined === true;
+      result?.payments?.joined === true;
 
     const allJoined =
       mainJoined &&
@@ -1532,13 +1526,6 @@ async function syncUser() {
       0
     );
 
-    /*
-      IMPORTANT:
-      Supabase column is referral_count.
-      Previously frontend was reading referrals,
-      which caused the UI to show 0 even when
-      database had referral_count = 1.
-    */
     referralCount =
       Number(
         backendUser.referral_count ??
@@ -1605,6 +1592,41 @@ async function syncUser() {
       "Minimum " +
       minimumWithdrawal +
       " GALAXY";
+
+    /*
+      IMPORTANT:
+      Backend /sync returns:
+      tasks: [
+        {
+          id,
+          available,
+          nextAvailableAt,
+          remainingSeconds
+        }
+      ]
+    */
+
+    if (
+      Array.isArray(
+        result.tasks
+      )
+    ) {
+
+      taskData = {};
+
+      result.tasks.forEach(
+        task => {
+
+          taskData[
+            task.id
+          ] = task;
+
+          applyTaskState(
+            task.id
+          );
+        }
+      );
+    }
 
   } catch (error) {
 
@@ -1720,6 +1742,238 @@ function showPage(
 
 
 /* ============================================================
+   TASK TIMER HELPERS
+   ============================================================ */
+
+function formatRemaining(
+  totalSeconds
+) {
+
+  totalSeconds =
+    Math.max(
+      0,
+      Number(
+        totalSeconds || 0
+      )
+    );
+
+  const hours =
+    Math.floor(
+      totalSeconds / 3600
+    );
+
+  const minutes =
+    Math.floor(
+      (
+        totalSeconds % 3600
+      ) / 60
+    );
+
+  const seconds =
+    totalSeconds % 60;
+
+  return (
+    String(hours).padStart(2, "0") +
+    ":" +
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(seconds).padStart(2, "0")
+  );
+}
+
+
+function getTaskElements(
+  taskId
+) {
+
+  const number =
+    taskId.replace(
+      "video",
+      ""
+    );
+
+  return {
+    button:
+      document.getElementById(
+        "task" + number
+      ),
+
+    timer:
+      document.getElementById(
+        "timer" + number
+      )
+  };
+}
+
+
+function clearTaskTimer(
+  taskId
+) {
+
+  if (
+    timerIntervals[taskId]
+  ) {
+
+    clearInterval(
+      timerIntervals[taskId]
+    );
+
+    delete timerIntervals[
+      taskId
+    ];
+  }
+}
+
+
+function applyTaskState(
+  taskId
+) {
+
+  const task =
+    taskData[
+      taskId
+    ];
+
+  if (!task) return;
+
+  const elements =
+    getTaskElements(
+      taskId
+    );
+
+  const button =
+    elements.button;
+
+  const timer =
+    elements.timer;
+
+  if (!button) return;
+
+  clearTaskTimer(
+    taskId
+  );
+
+  if (
+    task.available !== false
+  ) {
+
+    button.disabled =
+      false;
+
+    button.innerText =
+      "▶️ Watch & Earn +50";
+
+    if (timer) {
+
+      timer.classList.add(
+        "hidden"
+      );
+
+      timer.innerText =
+        "";
+    }
+
+    return;
+  }
+
+  button.disabled =
+    true;
+
+  button.innerText =
+    "⏳ Cooldown";
+
+  if (!timer) return;
+
+  timer.classList.remove(
+    "hidden"
+  );
+
+  let remaining =
+    Number(
+      task.remainingSeconds ||
+      0
+    );
+
+  if (
+    !remaining &&
+    task.nextAvailableAt
+  ) {
+
+    remaining =
+      Math.max(
+        0,
+        Math.ceil(
+          (
+            new Date(
+              task.nextAvailableAt
+            ).getTime() -
+            Date.now()
+          ) / 1000
+        )
+      );
+  }
+
+  function updateTimer() {
+
+    if (
+      remaining <= 0
+    ) {
+
+      clearTaskTimer(
+        taskId
+      );
+
+      button.disabled =
+        false;
+
+      button.innerText =
+        "▶️ Watch & Earn +50";
+
+      timer.classList.add(
+        "hidden"
+      );
+
+      timer.innerText =
+        "";
+
+      taskData[
+        taskId
+      ] = {
+        ...taskData[
+          taskId
+        ],
+        available:
+          true,
+        remainingSeconds:
+          0
+      };
+
+      return;
+    }
+
+    timer.innerText =
+      "⏱️ Available again in " +
+      formatRemaining(
+        remaining
+      );
+
+    remaining--;
+
+  }
+
+  updateTimer();
+
+  timerIntervals[
+    taskId
+  ] =
+    setInterval(
+      updateTimer,
+      1000
+    );
+}
+
+
+/* ============================================================
    WATCH TASK
    ============================================================ */
 
@@ -1750,6 +2004,28 @@ async function watchTask(
     return;
   }
 
+  /*
+    If backend already told us the task
+    is on cooldown, don't even call /earn.
+  */
+
+  const knownTask =
+    taskData[
+      taskId
+    ];
+
+  if (
+    knownTask &&
+    knownTask.available === false
+  ) {
+
+    applyTaskState(
+      taskId
+    );
+
+    return;
+  }
+
   button.disabled =
     true;
 
@@ -1775,6 +2051,11 @@ async function watchTask(
       );
     }
 
+    /*
+      Give Telegram/YouTube a moment
+      before claiming the task.
+    */
+
     await new Promise(
       resolve =>
         setTimeout(
@@ -1798,11 +2079,18 @@ async function watchTask(
         }
       );
 
-    if (result.ok) {
+    /*
+      Backend uses success:true,
+      not ok:true.
+    */
+
+    if (
+      result.success === true
+    ) {
 
       const reward =
         Number(
-          result.reward ||
+          result.earned ||
           50
         );
 
@@ -1810,8 +2098,60 @@ async function watchTask(
         result.balance
       );
 
-      button.innerText =
-        "⏳ Cooldown";
+      /*
+        Save cooldown immediately.
+      */
+
+      const nextAvailableAt =
+        result.nextAvailableAt ||
+        null;
+
+      let remainingSeconds =
+        0;
+
+      if (
+        nextAvailableAt
+      ) {
+
+        remainingSeconds =
+          Math.max(
+            0,
+            Math.ceil(
+              (
+                new Date(
+                  nextAvailableAt
+                ).getTime() -
+                Date.now()
+              ) / 1000
+            )
+          );
+      }
+
+      taskData[
+        taskId
+      ] = {
+        id:
+          taskId,
+
+        available:
+          false,
+
+        nextAvailableAt:
+          nextAvailableAt,
+
+        remainingSeconds:
+          remainingSeconds
+      };
+
+      applyTaskState(
+        taskId
+      );
+
+      /*
+        Refresh complete account data.
+      */
+
+      await syncUser();
 
       alert(
         "🎉 +" +
@@ -1824,11 +2164,10 @@ async function watchTask(
         " USDT) added!"
       );
 
-      await syncUser();
-
     } else {
 
       throw new Error(
+        result.message ||
         "Reward failed"
       );
     }
@@ -1839,6 +2178,79 @@ async function watchTask(
       "TASK ERROR:",
       error
     );
+
+    /*
+      Cooldown is a normal expected response,
+      NOT a server failure.
+    */
+
+    if (
+      error.data &&
+      error.data.error ===
+        "TASK_COOLDOWN"
+    ) {
+
+      const data =
+        error.data;
+
+      taskData[
+        taskId
+      ] = {
+        id:
+          taskId,
+
+        available:
+          false,
+
+        nextAvailableAt:
+          data.nextAvailableAt ||
+          null,
+
+        remainingSeconds:
+          Number(
+            data.remainingSeconds ||
+            0
+          )
+      };
+
+      applyTaskState(
+        taskId
+      );
+
+      alert(
+        "⏳ " +
+        (
+          data.message ||
+          "This task is still on cooldown."
+        )
+      );
+
+      return;
+    }
+
+    /*
+      Channel requirement.
+    */
+
+    if (
+      error.data &&
+      error.data.error ===
+        "CHANNEL_JOIN_REQUIRED"
+    ) {
+
+      verified =
+        false;
+
+      alert(
+        "❌ Please join both official channels first."
+      );
+
+      return;
+    }
+
+    /*
+      Any real server/API error.
+    */
 
     button.disabled =
       false;
@@ -2025,11 +2437,17 @@ async function requestPayout() {
         }
       );
 
+    /*
+      Backend uses success:true,
+      not ok:true.
+    */
+
     if (
-      result.ok
+      result.success === true
     ) {
 
       updateBalance(
+        result.balance ??
         Math.max(
           0,
           balance - amount
@@ -2065,7 +2483,10 @@ async function requestPayout() {
           ).toFixed(6) +
           " USDT)\n\n" +
           "TX Hash:\n" +
-          result.txHash
+          (
+            result.txHash ||
+            "Available in payout history"
+          )
         );
 
       } else {
@@ -2327,11 +2748,6 @@ function setupTelegramEvents() {
 
             updateUser();
 
-            /*
-              Refresh user data whenever
-              Telegram activates the Mini App.
-              This also refreshes referral count.
-            */
             await syncUser();
           }
         }
@@ -2369,21 +2785,6 @@ async function init() {
   await checkChannels();
 }
 
-if (
-  document.readyState ===
-  "loading"
-) {
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    init
-  );
-
-} else {
-
-  init();
-}
-
 
 /* ============================================================
    VISIBILITY CHANGE
@@ -2410,19 +2811,36 @@ document.addEventListener(
 
           setupTelegramEvents();
           updateUser();
+          await syncUser();
         }
 
       } else {
 
-        /*
-          Re-sync when Mini App comes
-          back into the foreground.
-        */
         await syncUser();
       }
     }
   }
 );
+
+
+/* ============================================================
+   RUN
+   ============================================================ */
+
+if (
+  document.readyState ===
+  "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    init
+  );
+
+} else {
+
+  init();
+}
 
 </script>
 
